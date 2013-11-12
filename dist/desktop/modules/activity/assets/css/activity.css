@@ -1,0 +1,95 @@
+.activity_hr, .activity_min
+{
+	color: #737373;	
+}
+
+.activity_hr
+{
+	vertical-align: top;
+	font-size: 150%;
+	width: 25px;
+	text-align: right;
+	display: inline-block;
+}
+
+.activity_min
+{
+	vertical-align: top;
+}
+
+.activity_day
+{
+	position: relative;
+}
+
+.activity_day > table.table
+{
+	border-bottom: 1px #ccc solid;
+	position: relative;	
+}
+
+.activity_day > table.table > tbody > tr > td
+{
+	padding: 0;
+}
+
+.activity_time
+{
+	position: relative;
+	top: -2px;
+	width: 50px;
+	border-right: 1px #ccc solid;
+}
+
+.activity_slot
+{
+	border-right: 1px #ccc solid;
+	position: relative;
+}
+
+.activity_units_within:hover
+{
+	background-color: orange;
+}
+
+.unselectable
+{
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+}
+
+.activity_line_in_between
+{
+	position: absolute;
+	top: 50%;
+	height: 1px;
+	border-top: 1px #f1f1f2 solid;
+	width: 100%;
+}
+
+.activity
+{
+	position: absolute;
+	border: 1px gray solid;
+}
+
+.activity_topbar, .activity_bottombar
+{
+	position: absolute;
+	height: 2px;
+	width: 100%;
+	cursor: row-resize;
+}
+
+.activity_topbar
+{
+	top: 0px;	
+}
+
+.activity_bottombar
+{
+	bottom: 0px;
+}

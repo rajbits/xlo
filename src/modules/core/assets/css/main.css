@@ -1,0 +1,10 @@
+.center
+{
+	float: none !important;
+	margin: 0 auto;
+}
+
+.tac
+{
+	text-align: center;
+}

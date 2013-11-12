@@ -1,0 +1,22 @@
+<div class='container' style='padding-top: 25px'>
+	<form>
+		<div class='col-xs-12 col-lg-12 form-group tac'>
+			<img src="assets/img/xlo-128x128.png"/>
+		</div>
+		<div class='col-xs-12 col-lg-12 form-group'>
+			<input dl-bind='user.email' type='text' class='form-control' placeholder="email">
+		</div>
+		<div class='col-xs-12 col-lg-12 form-group'>
+			<input dl-bind='user.pwd' type='password' class='form-control' placeholder="password">
+		</div>
+		<div class='col-xs-12 col-lg-12 form-group'>
+			<button class='btn btn-primary col-xs-12' dl-ui-event='{click: {{signIn}}}'>Sign In</button>
+		</div>
+		<div class='col-xs-6 tac'>
+			<a href='#'>Forgot Password</a>
+		</div>
+		<div class='col-xs-6 tac'>
+			<a href="#" dl-ui-event='{click: {{register_click}}}'>Register</a>
+		</div>
+	</form>
+</div>

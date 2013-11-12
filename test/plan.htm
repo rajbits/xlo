@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Duplex</title>
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div class='container'>
+			<h2>Plan</h2>
+			<div id='plan'>
+				<table class='table table-bordered'>
+					<thead>
+						<tr>
+							<th>Initiatives/Projects</th>
+							<th dl-repeat='months'><span dl-bind="mon"></span><br/><span dl-bind="year"></span></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr dl-repeat='projects'>
+							<th dl-bind='name'></th>
+							<!--td dl-repeat='months'></td-->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
+		<script src="../src/assets/lib/moment/moment.min.js"></script>
+		<script src='../src/assets/js/duplex-0.3.js'></script>
+		
+		<script>
+			var start = '1/1/2013', end = '1/4/2014', months = [];
+			var ed = moment(end);
+			for(var st = moment(start); st.isBefore(ed); st.add('months', 1))
+			{
+				months.push({mon: st.format('MMM'), year: st.year()});
+			}
+			
+			var projects = 
+			[
+				{name: 'Fee Netting'},
+				{name: 'Rating Engine'}
+			];
+			
+			var o =
+			{
+				template: $('#plan'),
+				model: {months: months, projects: projects}	
+			};
+			
+			var $el = duplex.render(o);
+			console.log($el);
+		</script>
+	</body>
+</html>

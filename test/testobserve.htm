@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Duplex Observe</title>
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+		<script src="observe-utils.js"></script>
+		<script src="observe-shim.js"></script>
+	</head>
+	<body>
+		<br><br>
+		<div class='col-md-4'>
+			<input type='text' class='form-control' id='tmp'>	
+		</div>
+		
+		<script>
+			var obj = {};
+			ObserveUtils.defineObservableProperties(obj, 'e');
+			Object.observe(obj, function(changes)
+			{
+				console.log(changes);
+			});
+		</script>
+	</body>
+</html>

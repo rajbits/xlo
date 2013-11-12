@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap-theme.min.css" />
+	</head>
+	<body style='padding-top: 60px'>
+		<div class='container'>
+			<div class="col-md-8 col-lg-8">
+				<input id='expr' type='text' class="form-control" value='Kagaz.arrow[abra[cada.bra]].basic' onchange='chg(event)'>
+			</div>
+			<div id='result'>				
+			</div>
+		</div>
+		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
+		<script src="testfn.js"></script>
+		<script>
+			function chg(e)
+			{
+				var $expr = e ? $(e.target) : $('#expr');				
+				var units = parse($expr.val());
+				console.log(JSON.stringify(units));
+				
+				var $ul = ui(units);
+				$('#result').html('').append($ul);		
+			}
+			
+			chg();
+		</script>
+	</body>
+</html>

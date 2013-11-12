@@ -1,0 +1,14 @@
+{
+  "name": "xlo",
+  "main": "index.htm",
+  
+  "window":
+  {
+  	"toolbar": false,
+  	"position": "mouse",
+  	"width": 350,
+  	"height": 600,
+  	"title": "Xlo",
+  	"always-on-top": true
+  }
+}

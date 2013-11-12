@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Duplex</title>
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div id='container' class='container'>
+			<h2>Family Names:</h2>
+		</div>
+		
+		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
+		<script src='../src/assets/js/duplex.deps-0.5.js'></script>
+		<script src='../src/assets/js/duplex-0.5.js'></script>
+		<script id='names' type='text/html'>
+			<div dl-repeat='l in list'>
+				<div class='col-md-6 col-xs-6 col-sm-6'>
+					<input dl-bind='l.firstName' type='text' class='form-control'></input>
+				</div>
+				<div class='col-md-6 col-xs-6 col-sm-6'>
+					<input dl-bind='l.lastName' type='text' class='form-control'></input>
+				</div>
+			</div>
+		</script>
+		<script>
+			var list =
+			[
+				{firstName: 'Raj', lastName: 'Chandrasekaran'},
+				{firstName: 'Jyothsna', lastName: 'Kothandaraman'},
+				{firstName: 'Vasinya', lastName: 'Rajkumar'},
+				{firstName: 'Chandrasekaran', lastName: 'Ganesan'},
+				{firstName: 'Padma', lastName: 'Guruswamy'},
+				{firstName: 'Alamelu', lastName: 'Ganesan'},
+				{firstName: 'Ganesa Iyer', lastName: 'MS'}
+			];
+			
+			var o =
+			{
+				template: $('#names').html(),
+				model: {list: list}
+			};
+			
+			var $el = duplex.render(o);
+			console.log($el.html());
+			$('#container').append($el);
+		</script>
+	</body>
+</html>
