@@ -4,73 +4,36 @@
 	Activity.day.activities = [];
 	Activity.day.buckets = [];
 	
-	Activity.day.add = function(activity)
+	Activity.day.render = function()
 	{
-		var $ad = Activity.day.get_ad();
-		var buck = Activity.day.add_activity(activity), width = 100, left = 0;
-		
-		for(var i=0; i < settings.dates.length; i++)
-		{
-			if (settings.dates[i].d.isSame(activity.day.d, 'day'))
-			{
-				var $f = $ad.find('>table >thead >tr >th:eq(' + (i + 1) + ')');
-				width = $f.width();	
-				left = $f.position().left;
-			}
-		}
-		
 		Xlo.assets.loadview('../activity/assets/view/activity.htm', function(tmpl)
 		{
-			var off = $ad.find('>table.activity_tbl >tbody').offset();
-			var $act = duplex.render
-			({
-				model:
-				{
-					activity: activity,
-					dim: 
-					{
-						top: off.top + (activity.start.hour() * 1 * (60 / settings.stop_gap) + activity.start.minute() * 1 / settings.stop_gap)  * settings.cell_height,
-						height: settings.cell_height,
-						left: left,
-						width: width
-					}
-				},
-				template: $(tmpl)
-			});
+			var $ad = Activity.day.get_ad();
+			var $cats = duplex.render({ model:{ activities: Activity.day.activities, default_parent: $ad }, template: $(tmpl) });
 			
-			$ad.append($act);
-			Activity.day.adjust_buckets = function(buck)
-			{
-				
-			};
-		});
+			$ad.append($cats);
+		});		
 	};
 	
-	Activity.day.add_activity = function(activity)
+	Activity.day.add = function(activity)
 	{
-		var acts = Activity.day.activities;
-		if (acts[activity.day.s] == undefined) acts[activity.day.s] = [];
+		var dim = {}, $ad = Activity.day.get_ad(), i = activity.day.d.diff(settings.start_date, 'days');
+		var $dest = $ad.find('>table >tbody >tr >td:eq(' + (i + 1) + ')'), off = $ad.find('>table.activity_tbl >tbody').offset();
+		var left = $dest.offset().left, width = $dest.width();
 		
-		acts[activity.day.s].push(activity);
-		return Activity.day.bucketize(activity);
-	};
-	
-	Activity.day.bucketize = function(activity)
-	{
-		var buck_found;
-		$.each(Activity.day.buckets, function(i, buck)
+		$.extend(dim, 
 		{
-			if (buck.end.isBefore(activity.start) || buck.start.isAfter(activity.end)) return true;
-			
-			buck.acts.push(activity);
-			buck_found = buck;
-			return false;
+			top: off.top + (activity.start.hour() * 1 * (60 / settings.stop_gap) + activity.start.minute() * 1 / settings.stop_gap)  * settings.cell_height,
+			height: settings.cell_height,
+			left: left,
+			width: width * 0.8
 		});
+				
+		var set = {activity: activity, dim: dim};
+		var buck = Activity.day.find_bucket(set);
+		Activity.day.activities.push(set);
 		
-		if (!buck_found)
-			Activity.day.buckets.push(buck_found = {start: activity.start, end: activity.end, acts: [activity]});
-			
-		return buck_found;
+		Activity.day.adjust_bucket(buck, $dest);
 	};
 	
 	Activity.day.get_ad = function()
@@ -81,15 +44,49 @@
 		return $ad;
 	};
 	
-	Activity.day.add_from = function($td, e)
+	Activity.day.find_bucket = function(set)
 	{
-		var activity = { title: 'New Activity'};
-		activity.day = settings.dates[$td.index() - 1];
+		var buck_found;
+		$.each(Activity.day.buckets, function(i, buck)
+		{
+			if (buck.end.isBefore(set.activity.start) || buck.start.isAfter(set.activity.end)) return true;
+			
+			buck.acts.push(set);
+			buck_found = buck;
+			return false;
+		});
+
+		if (!buck_found)
+			Activity.day.buckets.push(buck_found = {start: set.activity.start, end: set.activity.end, acts: [ set ]});
+			
+		return buck_found;
+	};
+	
+	Activity.day.adjust_bucket = function(buck, $dest)
+	{
+		var acts = buck.acts;
+		if (acts == null)
+			throw new Error('The bucket does not have any activities/dim. ' + buck.start + ' ' + buck.end);
 		
+		var w = $dest.width() * 0.8 / acts.length, l = $dest.offset().left;
+		$.each(acts, function(i, b)
+		{
+			$.extend(b.dim, { width: w, left: l + i * w + 1 });
+			console.log(b.activity.title);
+			console.log({ width: w, left: l + i * w + 1 });
+		});
+	};
+	
+	var K = 1;
+	Activity.day.add_from = function(e)
+	{
+		var $td = $(e.currentTarget);
+		var activity = { title: 'New Activity ' + (K++)};
+
+		activity.day = settings.dates[$td.index() - 1];
 		activity.start = moment(activity.day.d).hour($td.attr('hr') * 1).minute($td.attr('min') * 1);
 		activity.end = moment(activity.start).add('min', settings.stop_gap);
 		
-		Activity.day.add(activity);			
-	};	
-	
+		Activity.day.add(activity);
+	};
 })(window, jQuery);

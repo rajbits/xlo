@@ -1,5 +1,6 @@
-<div class='activity' dl-css='{top: {{ dim.top }} + "px", left: {{ dim.left }}, height: {{ dim.height }}, width: {{ dim.width }} }'>
+<div class='activity' dl-repeat='a in activities' 
+	dl-css='{top: {{ a.dim.top }} + "px", left: {{ a.dim.left }} + "px", height: {{ a.dim.height }}, width: {{ a.dim.width }} + "px"}'>
 	<div class='activity_topbar'></div>
-	<div class='activity_title'></div>
+	<div class='activity_title' dl-bind='a.activity.title'></div>
 	<div class='activity_bottombar'></div>
 </div>

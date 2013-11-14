@@ -13,28 +13,39 @@
 		
 		function oattr(a)
 		{
-			var units = $.parsex(a), obj = $scope._dyn || $scope, attr;
-			for(var j = 0; j < units.length; j++)
+			try
 			{
-				var u = units[j];
-				if (attr)
-					obj = obj[attr];
-				else if ($scope[u.n] != undefined)
-					obj = $scope;
-							
-				attr = u.n;
+				var units = $.parsex(a), obj = $scope._dyn || $scope, attr;			
+				for(var j = 0; j < units.length; j++)
+				{
+					var u = units[j];					
+					if (attr)
+						obj = obj[attr];
+					else if ($scope[u.n] != undefined)
+						obj = $scope;
+								
+					attr = u.n;
+				}
+				
+				return {obj: obj, attr: attr};	
 			}
-			
-			return {obj: obj, attr: attr};
+			catch(e)
+			{
+				console.log(e);
+				return undefined;
+			}			
 		}
 		
 		var Handlers = 
 		{
 			handle_bind: function($t, a)
 			{
-				var u = oattr(a), obj = u.obj, attr = u.attr;
+				var u = oattr(a);
+				if (u == undefined) return;
 				
+				var obj = u.obj, attr = u.attr;				
 				$t.value(obj[attr]);
+				
 				obj.watch(attr, function(aa, old, nu)
 				{
 					$t.value(nu);
@@ -94,15 +105,17 @@
 						{
 							$.each($.datay(ar, '_tmpl'), function(i, newbie)
 							{
+								if (!$.contains(document.documentElement, newbie.p)) newbie.p = $scope.default_parent;
 								var $clone = newbie.el.clone().removeAttr(DL + 'repeat').appendTo(newbie.p);
-								$.datay(aa, '_bind', $clone);								
+								
+								$.datay(aa, '_bind', $clone);		
 								recurse($clone);
 							});
 						}		
 					}
 					catch(e)
 					{
-						console.log(e);
+						console.error(e);
 					}								
 				}	
 				
@@ -131,42 +144,52 @@
 						
 			handle_json: function(type, $t, a)
 			{
-				var reg = /{{\s*(\w*\.*\w*)\s*}}/g, match;				
+				var reg = /{{\s*((\w*\.*)*)\s*}}/g /*/{{\s*(\w*\.*\w*)\s*}}/g*/, match;				
 				function setData($t, a, nu, m)
 				{
 					var v;
-					if (nu != undefined) a = a.replace(new RegExp('{{\s*' + m + '\s*}}'), JSON.stringify(nu));	
+					if (nu != undefined) a = a.replace(new RegExp('{{\\s*' + m.replace(/\./g, '\\.') + '\\s*}}'), JSON.stringify(nu));	
 					var at = a.replace(reg, function(match, p1, p2, p3, offset, string)
 					{
+						console.log(p1 + ' ' + p2 + ' ' + p3);
 						var ss = '$scope._dyn.' + p1;
 						if ($.save_eval(ss, $scope)) return ss;
 						
 						ss = '$scope.' + p1;
 						if ($.save_eval(ss, $scope)) return ss;
 						
-						throw new Error('The pattern does not seem to be valid :' + a);
+						// throw new Error('The pattern does not seem to be valid :' + a);
+						console.error('The pattern does not seem to be valid :' + a);
+						return '""';
 					});
 					
 					eval('v = ' + at);	
 					$t[type](v);
+					console.log(v);
 				}
 	
 				while((match = reg.exec(a)) != undefined)
 				{
 					var m = match[1];
-					var u = oattr(m), obj = u.obj, attr = u.attr;
+					var u = oattr(m);
+					if (u == undefined) break;
 					
+					var obj = u.obj, attr = u.attr;					
 					$.dataz(obj, attr, $t);
-					obj.watch(attr, function(aa, old, nu)
+
+					(function(m)
 					{
-						var $ts = $.dataz(obj, attr);
-						$.each($ts, function(k, $tt)
+						obj.watch(attr, function(aa, old, nu)
 						{
-							setData($tt, a, nu, m);	
+							var $ts = $.dataz(obj, aa);
+							$.each($ts, function(k, $tt)
+							{
+								setData($tt, a, nu, m);	
+							});
+													
+							return nu;
 						});
-												
-						return nu;
-					});
+					})(m);					
 				}
 				
 				setData($t, a);

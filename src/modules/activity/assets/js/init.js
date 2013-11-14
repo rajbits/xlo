@@ -1,7 +1,11 @@
 (function(window, $)
 {	
 	Xlo.assets.loadcss('../activity/assets/css/activity.css');
-	Xlo.assets.loadjs('../activity/assets/js/activity.js');
+	Xlo.assets.loadjs('../activity/assets/js/activity.js', function()
+	{		
+		Activity.day.render();
+	});
+	
 	Xlo.assets.loadview('../activity/assets/view/activity_day.htm', function(tmpl)
 	{
 		var $tmpl = $(tmpl);		
@@ -46,13 +50,13 @@
 		{
 			touchstart: function(e)
 			{
-				Activity.day.add_from($(this), e);
+				Activity.day.add_from(e);
 			}
 		};
 		
 		reset();
 		
 		var $act = duplex.render({ model: { settings: settings, handlers: handlers }, template: $tmpl });
-		$('#main').empty().append($act);		
+		$('#main').empty().append($act);			
 	});
 })(window, jQuery);
