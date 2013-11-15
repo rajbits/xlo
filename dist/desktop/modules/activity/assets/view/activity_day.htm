@@ -18,7 +18,7 @@
 						<span class='activity_hr' dl-bind='ts.hr'></span>
 						<span class='activity_min' dl-bind='ts.min'></span>
 					</td>
-					<td dl-repeat='us in settings.units_ar' class='activity_slot' dl-ui-event='{ touchstart: {{ handlers.touchstart }}, mousedown: {{ handlers.touchstart }} }' dl-attr='{ hr: {{ ts.hr }}, min: {{ ts.min }} }'>
+					<td dl-repeat='us in settings.units_ar' class='activity_slot' dl-ui-event='{ touchstart: {{ handlers.touchstart }}, dblclick: {{ handlers.touchstart }} }' dl-attr='{ hr: {{ ts.hr }}, min: {{ ts.min }} }'>
 						<div class='activity_line_in_between'></div>
 					</td>
 				</tr>

@@ -2,5 +2,5 @@
 	dl-css='{top: {{ a.dim.top }} + "px", left: {{ a.dim.left }} + "px", height: {{ a.dim.height }}, width: {{ a.dim.width }} + "px"}'>
 	<div class='activity_topbar'></div>
 	<div class='activity_title' dl-bind='a.activity.title'></div>
-	<div class='activity_bottombar'></div>
+	<div class='activity_bottombar' dl-ui-event='{mousedown: {{handler.resize}}, touchdown: {{handler.resize}} }'></div>
 </div>

@@ -151,7 +151,6 @@
 					if (nu != undefined) a = a.replace(new RegExp('{{\\s*' + m.replace(/\./g, '\\.') + '\\s*}}'), JSON.stringify(nu));	
 					var at = a.replace(reg, function(match, p1, p2, p3, offset, string)
 					{
-						console.log(p1 + ' ' + p2 + ' ' + p3);
 						var ss = '$scope._dyn.' + p1;
 						if ($.save_eval(ss, $scope)) return ss;
 						
@@ -165,7 +164,6 @@
 					
 					eval('v = ' + at);	
 					$t[type](v);
-					console.log(v);
 				}
 	
 				while((match = reg.exec(a)) != undefined)
@@ -182,10 +180,13 @@
 						obj.watch(attr, function(aa, old, nu)
 						{
 							var $ts = $.dataz(obj, aa);
-							$.each($ts, function(k, $tt)
+							setTimeout(function()
 							{
-								setData($tt, a, nu, m);	
-							});
+								$.each($ts, function(k, $tt)
+								{
+									setData($tt, a, nu, m);	
+								});
+							}, 1);
 													
 							return nu;
 						});

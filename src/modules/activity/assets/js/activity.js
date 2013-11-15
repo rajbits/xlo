@@ -9,7 +9,7 @@
 		Xlo.assets.loadview('../activity/assets/view/activity.htm', function(tmpl)
 		{
 			var $ad = Activity.day.get_ad();
-			var $cats = duplex.render({ model:{ activities: Activity.day.activities, default_parent: $ad }, template: $(tmpl) });
+			var $cats = duplex.render({ model:{ activities: Activity.day.activities, default_parent: $ad, handler: handler }, template: $(tmpl) });
 			
 			$ad.append($cats);
 		});		
@@ -26,7 +26,7 @@
 			top: off.top + (activity.start.hour() * 1 * (60 / settings.stop_gap) + activity.start.minute() * 1 / settings.stop_gap)  * settings.cell_height,
 			height: settings.cell_height,
 			left: left,
-			width: width * 0.8
+			width: width * 0.9
 		});
 				
 		var set = {activity: activity, dim: dim};
@@ -68,12 +68,10 @@
 		if (acts == null)
 			throw new Error('The bucket does not have any activities/dim. ' + buck.start + ' ' + buck.end);
 		
-		var w = $dest.width() * 0.8 / acts.length, l = $dest.offset().left;
+		var w = $dest.width() * 0.9 / acts.length, l = $dest.offset().left;
 		$.each(acts, function(i, b)
 		{
 			$.extend(b.dim, { width: w, left: l + i * w + 1 });
-			console.log(b.activity.title);
-			console.log({ width: w, left: l + i * w + 1 });
 		});
 	};
 	
@@ -89,4 +87,25 @@
 		
 		Activity.day.add(activity);
 	};
+	
+	var handler = {};
+	handler.resize = function(e) //mousedown
+	{
+		var $me = $(e.currentTarget).parent(), origin = {x: e.pageX, y: e.pageY, h: $me.height()};
+		var move = function(e)
+		{
+			$me.height(origin.h + e.pageY - origin.y);
+		};
+		
+		var up = function(e)
+		{
+			$(document).off('mousemove', move);
+			$(document).off('mouseup', up);
+		};
+		
+		$me.unselectable();
+		$(document).on('mousemove', move);
+		$(document).on('mouseup', up);
+	};
+	
 })(window, jQuery);

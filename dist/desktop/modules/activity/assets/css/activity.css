@@ -74,6 +74,10 @@
 {
 	position: absolute;
 	border: 1px gray solid;
+	border-radius: 3px;
+	overflow: hidden;
+	font-size: 90%;
+	padding: 3px;
 }
 
 .activity_topbar, .activity_bottombar
