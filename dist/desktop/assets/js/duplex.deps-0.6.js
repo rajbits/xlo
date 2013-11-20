@@ -2,6 +2,31 @@
 	{
 		return Array == o.constructor;
 	}
+	
+	function watchArray(ar, handler)
+	{
+		function handle_array(node, handler)
+		{
+			node.push = function(nu)
+			{
+				Array.prototype.push.call(this, nu);
+				handler.call(this, this, 'add', this.length - 1, nu);
+				return nu;
+			};
+		
+			node.pop = function()
+			{
+				var old = Array.prototype.pop.call(this);
+				handler.call(this, this, 'remove', this.length, old);
+			};
+		}
+		
+		if (isArray(ar))
+		{
+			handle_array(ar, handler);
+			return;
+		}
+	}
 		
 	(function()
 	{
@@ -55,7 +80,7 @@
 				}
 			});
 		}
-	})();
+	})/*()*/;
 	
 	$.fn.value = function(val)
 	{

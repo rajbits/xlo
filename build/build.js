@@ -68,9 +68,11 @@ function Build(argv)
 					fileName = fileName.replace(SRC + path.sep, '');
 					console.log('file: ' + fileName);
 					
-					var exists = fs.exists(SRC + path.sep + fileName);
-					
-					if (exists && fs.lstatSync(SRC + path.sep + fileName).isDirectory())
+					var exists = fs.existsSync(SRC + path.sep + fileName),
+						isDir = fs.lstatSync(SRC + path.sep + fileName).isDirectory();
+		
+					console.log("File exists " + exists + " Is Dir " + isDir);			
+					if (exists && isDir)
 					{
 						extra.mkdirRecursiveSync(target + path.sep + fileName, 0777);
 						return;	
@@ -85,7 +87,7 @@ function Build(argv)
 						console.log('Exception (may be a new file)' + e.message);
 					}
 					
-					!exists && extra.copy(SRC + path.sep + fileName, target + path.sep + fileName, function(err)
+					extra.copy(SRC + path.sep + fileName, target + path.sep + fileName, function(err)
 					{
 						if (!err)
 							console.log('Copied ' + SRC + path.sep + fileName + "\n" + target + path.sep + fileName);

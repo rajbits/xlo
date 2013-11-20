@@ -41,6 +41,11 @@
 	border-right: 1px #ccc solid;
 }
 
+.activity_title
+{
+	height: 100%;	
+}
+
 .activity_slot
 {
 	border-right: 1px #ccc solid;

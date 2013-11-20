@@ -1,6 +1,7 @@
 <div class='activity' dl-repeat='a in activities' 
+	dl-data='{o: {{a}}}'
 	dl-css='{top: {{ a.dim.top }} + "px", left: {{ a.dim.left }} + "px", height: {{ a.dim.height }}, width: {{ a.dim.width }} + "px"}'>
-	<div class='activity_topbar'></div>
-	<div class='activity_title' dl-bind='a.activity.title'></div>
-	<div class='activity_bottombar' dl-ui-event='{mousedown: {{handler.resize}}, touchdown: {{handler.resize}} }'></div>
+	<div class='activity_topbar' dl-ui-event='{mousedown: {{handler.nresize}}, touchdown: {{handler.nresize}} }'></div>
+	<div class='activity_title' dl-bind='a.activity.title' dl-ui-event='{mousedown: {{handler.drag}}}'></div>
+	<div class='activity_bottombar' dl-ui-event='{mousedown: {{handler.sresize}}, touchdown: {{handler.sresize}} }'></div>
 </div>

@@ -128,6 +128,7 @@
 				$.each(ar, function(i, aa)
 				{
 					if ($scope._dyn == undefined) $scope._dyn = [];
+					
 					$scope._dyn[itr] = aa;
 					add(false, ar[i], i);					
 				});
@@ -164,6 +165,8 @@
 					
 					eval('v = ' + at);	
 					$t[type](v);
+console.log(at);
+console.log(v);					
 				}
 	
 				while((match = reg.exec(a)) != undefined)
@@ -177,7 +180,7 @@
 
 					(function(m)
 					{
-						obj.watch(attr, function(aa, old, nu)
+						/*obj.watch(attr, function(aa, old, nu)
 						{
 							var $ts = $.dataz(obj, aa);
 							setTimeout(function()
@@ -186,9 +189,20 @@
 								{
 									setData($tt, a, nu, m);	
 								});
-							}, 1);
+							}, 0);
 													
 							return nu;
+						});*/
+						watch(obj, attr, function(aa, action, nu, old)
+						{
+							var $ts = $.dataz(obj, aa);
+							setTimeout(function()
+							{
+								$.each($ts, function(k, $tt)
+								{
+									setData($tt, a, nu, m);	
+								});
+							}, 0);
 						});
 					})(m);					
 				}
@@ -210,7 +224,7 @@
 			
 			handle_data: function($t, a)
 			{
-				this.handle_json('data', $t, a);
+				Handlers.handle_json('data', $t, a);
 			},
 						
 			handle_css: function($t, a)

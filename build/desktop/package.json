@@ -1,6 +1,7 @@
 {
   "name": "xlo",
-  "main": "index.htm",
+  "main": "modules/core/index.htm",
+  "chromium-args": "--ignore-certificate-errors --ignore-urlfetcher-cert-requests",
   
   "window":
   {

@@ -46,11 +46,12 @@
 				var obj = u.obj, attr = u.attr;				
 				$t.value(obj[attr]);
 				
-				obj.watch(attr, function(aa, old, nu)
+				/*obj.watch(attr, function(aa, old, nu)
 				{
 					$t.value(nu);
 					return nu;
-				});
+				});*/
+				
 				
 				Handlers.attach_binding($t, $scope, obj, attr);
 			},
@@ -116,13 +117,14 @@
 					catch(e)
 					{
 						console.error(e);
+						throw e;
 					}								
 				}	
 				
 				function remove(old, idx)
 				{
 					var $els = $.datay(old, '_bind');
-					if ($els != undefined) $.each($els, function(i, $el) { $el.remove() });
+					if ($els != undefined) $.each($els, function(i, $el) { $el.remove(); });
 				}
 				
 				$.each(ar, function(i, aa)
@@ -133,8 +135,17 @@
 					add(false, ar[i], i);					
 				});
 				
-				ar.watch(null, function(arr, op, idx, nu)
+				/*ar.watch(null, function(arr, op, idx, nu)
 				{
+					$scope[itr] = nu;
+					if (op == 'add') add(true, nu);
+					if (op == 'remove') remove(nu, idx);
+				});
+				*/
+				
+				watchArray(ar, function(arr, op, idx, nu)
+				{
+					console.log(arguments);
 					$scope[itr] = nu;
 					if (op == 'add') add(true, nu);
 					if (op == 'remove') remove(nu, idx);
@@ -145,7 +156,7 @@
 						
 			handle_json: function(type, $t, a)
 			{
-				var reg = /{{\s*((\w*\.*)*)\s*}}/g /*/{{\s*(\w*\.*\w*)\s*}}/g*/, match;				
+				var reg = /{{\s*((\w*\.*)*)\s*}}/g /*/{{\s*(\w*\.*\w*)\s*}}/g*/, match, d = {}, $d = $(d);				
 				function setData($t, a, nu, m)
 				{
 					var v;
@@ -163,10 +174,21 @@
 						return '""';
 					});
 					
-					eval('v = ' + at);	
-					$t[type](v);
-console.log(at);
-console.log(v);					
+					eval('v = ' + at);
+					// $t[type](v);
+					for (var k in v)
+					{							
+						// if (v[k] != undefined && (v[k] + '').indexOf('$scope') >= 0) continue;
+						if (m != undefined && m.indexOf(k) < 0) continue;
+						console.log('m - ' + m + ' type - ' + type + ' prop - ' + k + ' ' + v[k]);
+						// console.log(at);
+						console.log($t.get(0));	
+
+						var kk = {};
+						kk[k] = v[k];
+						$t[type](kk);
+					}
+					// $d.trigger('duplex.json.change', [$t, type, v]);
 				}
 	
 				while((match = reg.exec(a)) != undefined)
@@ -196,16 +218,26 @@ console.log(v);
 						watch(obj, attr, function(aa, action, nu, old)
 						{
 							var $ts = $.dataz(obj, aa);
-							setTimeout(function()
+							$.each($ts, function(k, $tt)
 							{
-								$.each($ts, function(k, $tt)
-								{
-									setData($tt, a, nu, m);	
-								});
-							}, 0);
+								setData($tt, a, nu, m);	
+							});						
 						});
 					})(m);					
 				}
+				
+				$d.on('duplex.json.change', function(e, $t, type, v)
+				{
+					(function($scope)
+					{
+						for (var k in v)
+						{							
+							if (v[k] != undefined && (v[k] + '').indexOf('$scope') >= 0) continue;
+							console.log('prop - ' + k + ' ' + v[k]);
+							$t[type][k] = v[k];
+						}
+					})($scope);							
+				});
 				
 				setData($t, a);
 			},

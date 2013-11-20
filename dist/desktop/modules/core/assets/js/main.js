@@ -4,7 +4,7 @@ var user =
 	pwd: null	
 };
 
-Xlo.server = 'https://localhost:9000/';
+Xlo.server = 'http://localhost:9000/';
 
 Xlo.assets.loadcss('assets/css/main.css', function(){ });
 function login()
