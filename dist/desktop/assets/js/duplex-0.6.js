@@ -164,9 +164,7 @@
 					});
 					
 					eval('v = ' + at);	
-					$t[type](v);
-console.log(at);
-console.log(v);					
+					$t[type](v);					
 				}
 	
 				while((match = reg.exec(a)) != undefined)
@@ -180,7 +178,7 @@ console.log(v);
 
 					(function(m)
 					{
-						/*obj.watch(attr, function(aa, old, nu)
+						obj.watch(attr, function(aa, old, nu)
 						{
 							var $ts = $.dataz(obj, aa);
 							setTimeout(function()
@@ -192,17 +190,6 @@ console.log(v);
 							}, 0);
 													
 							return nu;
-						});*/
-						watch(obj, attr, function(aa, action, nu, old)
-						{
-							var $ts = $.dataz(obj, aa);
-							setTimeout(function()
-							{
-								$.each($ts, function(k, $tt)
-								{
-									setData($tt, a, nu, m);	
-								});
-							}, 0);
 						});
 					})(m);					
 				}

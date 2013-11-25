@@ -31,6 +31,13 @@
 .activity_day > table.table > tbody > tr > td
 {
 	padding: 0;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.activity_day > table.table > tbody > tr > td:first-child
+{
+	vertical-align: top;
 }
 
 .activity_time
@@ -69,7 +76,6 @@
 .activity_line_in_between
 {
 	position: absolute;
-	top: 50%;
 	height: 1px;
 	border-top: 1px #f1f1f2 solid;
 	width: 100%;

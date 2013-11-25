@@ -116,6 +116,7 @@
 					catch(e)
 					{
 						console.error(e);
+						throw e;
 					}								
 				}	
 				
@@ -163,8 +164,15 @@
 						return '""';
 					});
 					
-					eval('v = ' + at);	
-					$t[type](v);					
+					eval('v = ' + at);
+					for (var k in v)
+					{							
+						if (m != undefined && m.indexOf(k) < 0) continue;
+						
+						var kk = {};
+						kk[k] = v[k];
+						$t[type](kk);
+					}					
 				}
 	
 				while((match = reg.exec(a)) != undefined)

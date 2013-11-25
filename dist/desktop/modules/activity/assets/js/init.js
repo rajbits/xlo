@@ -16,7 +16,8 @@
 			units_within: 6,
 			no_of_days: 3,
 			cell_height: 50,
-			start_date: moment()
+			snap: 4,
+			start_date: moment().hours(0).minutes(0).seconds(0)
 		};
 
 		function reset()

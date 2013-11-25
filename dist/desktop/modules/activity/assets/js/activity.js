@@ -35,7 +35,7 @@
 		
 		Activity.day.adjust_bucket(buck, $dest);
 	};
-	
+		
 	Activity.day.get_ad = function()
 	{
 		var $ad = Activity.day.$ad;
@@ -57,11 +57,11 @@
 			console.log('-------------------------------------');
 			
 			if (buck.end.isBefore(set.activity.start) || buck.start.isAfter(set.activity.end)) return true;
-			if (buck.end.isSame(set.activity.start) || buck.start.isSame(set.activity.end)) return true;
+			if (buck.end.isSame(set.activity.start, 'minute') || buck.start.isSame(set.activity.end, 'minute')) return true;
 			
 			buck.acts.push(set);
-			buck.start = buck.start.min(set.activity.start);
-			buck.end = buck.end.max(set.activity.end);
+			buck.start = buck.start.max(set.activity.start);
+			buck.end = buck.end.min(set.activity.end);
 			buck_found = buck;
 			return false;
 		});
@@ -98,15 +98,11 @@
 		
 		$.each(Activity.day.buckets, function(i, buck)
 		{
-			console.log('***************');
-			console.log(buck);
-			console.log('***************');
 			if (buck.acts.length == 0) return true;
 			
 			var idx = buck.acts[0].activity.day.d.diff(settings.start_date, 'days');
 			var $dest = $ad.find('>table >tbody >tr >td:eq(' + (idx + 1) + ')');
-console.log(idx);
-console.log($dest.get(0));		
+
 			Activity.day.adjust_bucket(buck, $dest);
 		});
 	};
@@ -124,6 +120,52 @@ console.log($dest.get(0));
 		Activity.day.add(activity);
 	};
 	
+	Activity.day.refresh_activity = function($act)
+	{
+		var set = $act.data('o');
+		if (set == undefined) throw new Error('Activity element not associated with data');
+		
+		$.extend(set.dim, { left: $act.css('left'), top: $act.css('top'), height: $act.innerHeight(), width: $act.outerWidth() });
+		Activity.day.refresh_activity_time(set);
+	};
+	
+	Activity.day.refresh_activity_time = function(set)
+	{
+		var $ad = Activity.day.get_ad(), time_width = $ad.find('>table >tbody >tr >td:eq(0)').outerWidth();
+		var i = Math.floor((set.dim.left.replace(/px/, '') * 1 - time_width) / $ad.find('>table >tbody >tr >td:eq(1)').outerWidth());
+		var ht = settings.cell_height / (settings.snap || 1);
+		
+		if (i < 0) i = 0;
+		var $dest = $ad.find('>table >tbody >tr >td:eq(' + (i + 1) + ')'), off = $ad.find('>table.activity_tbl >tbody').offset();
+		var left = $dest.offset().left, width = $dest.width();		
+		
+		if (settings.snap)
+		{
+			set.dim.top = Math.round((set.dim.top.replace(/px/, '') * 1 - off.top) / ht) * ht + off.top;
+			set.dim.top += 'px';
+			set.dim.height = Math.round(set.dim.height / ht) * ht;
+		}
+		
+		var mins  = (set.dim.top.replace(/px/, '') * 1 - off.top) / settings.cell_height * settings.stop_gap;
+		set.activity.day = { d: moment(settings.start_date).add('day', i) };
+		set.activity.day.s = set.activity.day.d.format('MM/DD/YYYY');
+			
+		set.activity.start.hours(0); set.activity.end.hours(0); //Setting mins later will automatically set hours
+		set.activity.start.minutes(mins);
+		set.activity.start.seconds((mins % 1) * 60);
+		
+		var emins = mins + (set.dim.height / settings.cell_height) * settings.stop_gap;		
+		set.activity.end.minutes(emins);
+		set.activity.end.seconds((emins % 1) * 60);
+		
+		set.activity.start.year(set.activity.day.d.year());set.activity.end.year(set.activity.day.d.year());
+		set.activity.start.month(set.activity.day.d.month());set.activity.end.month(set.activity.day.d.month());
+		set.activity.start.date(set.activity.day.d.date());set.activity.end.date(set.activity.day.d.date());
+		
+		Activity.day.refresh_buckets();
+	};
+	
+	
 	var handler = {};
 	handler.nresize = function(e)
 	{
@@ -134,7 +176,7 @@ console.log($dest.get(0));
 	{
 		handler.resize(e);
 	};
-	
+		
 	handler.resize = function(e, dir) //mousedown
 	{
 		var $me = $(e.currentTarget).parent(), origin = {x: e.pageX, y: e.pageY, h: $me.height(), off: $me.offset()}, $a = $('div.activity');
@@ -153,6 +195,8 @@ console.log($dest.get(0));
 			$(document).off('mousemove', move);
 			$(document).off('mouseup', up);
 			$a.removeClass('unselectable');
+			
+			Activity.day.refresh_activity($me);
 		};
 		
 		$a.addClass('unselectable');
@@ -173,10 +217,17 @@ console.log($dest.get(0));
 			$(document).off('mousemove', move);
 			$(document).off('mouseup', up);
 			$a.removeClass('unselectable');
+			
+			Activity.day.refresh_activity($me);
 		};
 		
 		$a.addClass('unselectable');
 		$(document).on('mousemove', move);
 		$(document).on('mouseup', up);
+	};
+	
+	handler.open = function(e)
+	{
+		console.log(e);
 	};
 })(window, jQuery);

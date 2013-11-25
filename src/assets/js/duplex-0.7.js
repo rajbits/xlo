@@ -178,6 +178,7 @@
 					// $t[type](v);
 					for (var k in v)
 					{							
+						console.log('m - ' + m);
 						// if (v[k] != undefined && (v[k] + '').indexOf('$scope') >= 0) continue;
 						if (m != undefined && m.indexOf(k) < 0) continue;
 						console.log('m - ' + m + ' type - ' + type + ' prop - ' + k + ' ' + v[k]);
