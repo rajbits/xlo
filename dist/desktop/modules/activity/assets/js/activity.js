@@ -46,30 +46,53 @@
 	
 	Activity.day.find_bucket = function(set)
 	{
-		var buck_found;
-		$.each(Activity.day.buckets, function(i, buck)
+		var bf = [], b = Activity.day.buckets;
+		$.each(b, function(i, buck)
 		{
-			console.log('-------------------------------------');
-			console.log(buck.start.format("dddd, MMMM Do YYYY, h:mm:ss a"));
-			console.log(buck.end.format("dddd, MMMM Do YYYY, h:mm:ss a"));
-			console.log(set.activity.start.format("dddd, MMMM Do YYYY, h:mm:ss a"));
-			console.log(set.activity.end.format("dddd, MMMM Do YYYY, h:mm:ss a"));
-			console.log('-------------------------------------');
-			
+			if (buck == undefined) return true;
 			if (buck.end.isBefore(set.activity.start) || buck.start.isAfter(set.activity.end)) return true;
 			if (buck.end.isSame(set.activity.start, 'minute') || buck.start.isSame(set.activity.end, 'minute')) return true;
-			
+			if (buck.acts.indexOf(set) >= 0) return true; //If the activity already exists
+						
 			buck.acts.push(set);
 			buck.start = buck.start.max(set.activity.start);
 			buck.end = buck.end.min(set.activity.end);
-			buck_found = buck;
-			return false;
+			bf.push(buck);
 		});
 
-		if (!buck_found)
-			Activity.day.buckets.push(buck_found = {start: set.activity.start, end: set.activity.end, acts: [ set ]});
+		//TODO: Optimize this section better
+		function unique_join(target, src)
+		{
+			$.each(src, function(i, s)
+			{
+				target.indexOf(s) < 0 && target.push(s);
+			});
+		}
+		
+		var k;
+		$.each(bf, function(i, bb)
+		{
+			if (i == 0 && (k = b.indexOf(bb)) >= 0) return true;
+			if (b[k].acts.indexOf(bb.acts) >= 0) return true;
+				
+			unique_join(b[k].acts, bb.acts);
 			
-		return buck_found;
+			b[k].start = b[k].start.max(bb.start);
+			b[k].end = b[k].end.min(bb.end);
+			
+			delete b[b.indexOf(bb)];
+		});
+		
+		(bf.length > 0) && $.each(b, function(i, buck)
+		{
+			if (buck == undefined)
+				b.splice(i, 1);
+		});
+		
+		if (bf.length == 0)
+			bf.push({start: set.activity.start, end: set.activity.end, acts: [ set ]}) && b.push(bf[0]);
+			
+		return bf[0];
 	};
 	
 	Activity.day.adjust_bucket = function(buck, $dest)
