@@ -105,7 +105,6 @@
 		$.each(acts, function(i, b)
 		{
 			$.extend(b.dim, { width: w, left: l + i * w + 1 });
-			console.log('width: ' + b.dim.width + ' top:' + b.dim.top + ' left:' + b.dim.left);
 		});
 	};
 	

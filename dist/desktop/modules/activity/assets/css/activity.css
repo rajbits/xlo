@@ -28,6 +28,11 @@
 	position: relative;	
 }
 
+.activity_day > table.table > thead > tr > th
+{
+	border-bottom: 0px;
+}
+
 .activity_day > table.table > tbody > tr > td
 {
 	padding: 0;

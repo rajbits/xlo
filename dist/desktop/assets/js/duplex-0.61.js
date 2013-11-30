@@ -231,6 +231,11 @@
 			handle_attr: function($t, a)
 			{
 				Handlers.handle_json('attr', $t, a);
+			},
+			
+			handle_animate: function($t, a)
+			{
+				Handlers.handle_json('animate', $t, a);
 			}
 		};
 		
@@ -241,7 +246,8 @@
 			{name: 'data', handler: Handlers.handle_data},
 			{name: 'attr', handler: Handlers.handle_attr},
 			{name: 'ui-event', handler: Handlers.handle_ui_event},
-			{name: 'css', handler: Handlers.handle_css}
+			{name: 'css', handler: Handlers.handle_css},
+			{name: 'animate', handler: Handlers.handle_animate}
 		];
 		
 		function recurse($t)
