@@ -22,7 +22,16 @@
 		<script src='../src/assets/js/duplex.deps-0.6.js'></script>
 		<script src='../src/assets/js/duplex-0.61.js'></script>
 		<script>
-			var $main = $('#main'), $tbl = $main.find('>table').css({position: 'relative'}), rows = 100, cols = 10;
+			$.fn.freeze = function(opts)
+			{
+				return this.each(function()
+				{
+					
+				});
+			};
+		</script>
+		<script>
+			var $main = $('#main'), $tbl = $main.find('>table').css({position: 'relative', zIndex: 50}), rows = 100, cols = 10;
 			function load_data()
 			{
 				var $thead = $('<thead/>').appendTo($tbl);
@@ -70,7 +79,9 @@
 			
 			function add_listeners()
 			{
-				var pos = $tbl.position(), scrolling = false, $thead = $tbl.find('>thead'), $tbody = $tbl.find('>tbody'), timeout;
+				var pos = $tbl.offset(), scrolling = false, $thead = $tbl.find('>thead').css({'border-bottom': 0}), $tbody = $tbl.find('>tbody'), timeout;
+				var $coltbl;
+				
 				$(window).on('scroll', function(e)
 				{
 					if (!scrolling)
@@ -79,7 +90,7 @@
 						scrolling = true;	
 					}
 					
-					var $win = $(this), st = $win.scrollTop();
+					var $win = $(this), st = $win.scrollTop(), sl = $win.scrollLeft();
 					if (st - pos.top > 0)
 					{
 						$thead.find('>tr>th').each(function(i, th)
@@ -87,14 +98,78 @@
 							var w = $tbody.find('>tr:eq(0) >td:nth-child(' + (i+1) + ')').outerWidth();
 							$(th).css({'min-width': w, width: w});	
 						});
-						$thead.css({position: 'absolute', top: st - pos.top, left: 0});
+						$thead.css({position: 'absolute', top: st - pos.top, left: 0});						
 					}
 					else
 					{
 						$thead.css({position: 'inherit', top: "", width: ""});
 						restore_widths($thead);
 					}
-										
+							
+					//Column freeze
+					if (sl - pos.left > 0)
+					{												
+						if ($coltbl == undefined)
+						{
+							$coltbl = $('<table/>').addClass('table table-striped table-bordered')
+									.appendTo($tbl.parent().css({position: 'relative'}))
+									.css({position: 'absolute', display: 'inline-block', zIndex: 100, backgroundColor: '#fff', width: 'auto'});
+						}
+						
+						if (!$coltbl.data('loaded'))
+						{
+							$coltbl.append('<thead/>').append('<tbody/>');
+							$thead.find('>tr >:nth-child(1)').each(function(i, td)
+							{
+								var $tr = $('<tr/>').append(td);
+								$coltbl.find('>thead').css({position: 'relative'}).append($tr);
+							});
+							
+							$tbody.find('>tr >:nth-child(1)').each(function(i, td)
+							{
+								var $td = $(td);
+								$td.css({'min-height': $td.height()});
+								
+								var $tr = $('<tr/>').append($td);
+								$coltbl.find('>tbody').append($tr);
+							});
+							
+							$coltbl.data('loaded', true);								
+						}
+						
+						$coltbl.css({left: sl - pos.left, top: 0}).show();
+						$coltbl.find('>thead').css({top: st - pos.top - 1, 'min-width': $coltbl.find('>tbody').width()});
+						
+						if (st - pos.top > 0)
+						{
+							$coltbl.find('>thead').css({ position: 'absolute'});
+						}
+						else
+						{
+							$coltbl.find('>thead').css({position: 'relative'});
+						}
+						
+						$coltbl.css({ 'min-width': $coltbl.find('>tbody').width() });
+					}
+					else
+					{
+						if ($coltbl != undefined)
+						{
+							$coltbl.find('>thead >tr >:nth-child(1)').each(function(i, td)
+							{
+								$thead.find('>tr:eq(' + i + ')').prepend(td);
+							});
+							
+							$coltbl.find('>tbody >tr >:nth-child(1)').each(function(i, td)
+							{
+								$tbody.find('>tr:eq(' + i + ')').prepend(td);
+							});
+							
+							$coltbl.empty().hide();
+							$coltbl.data('loaded', false);
+						}											
+					}									
+							
 					clearTimeout(timeout);
 					timeout = setTimeout(function()
 					{
@@ -102,41 +177,6 @@
 					}, 50);
 				});
 			}
-			
-			/*function add_listeners()
-			{
-				var pos = $tbl.position(), scrolling = false, $thead = $tbl.find('>thead'), $tbody = $tbl.find('>tbody'), timeout;
-				$(window).on('scroll', function(e)
-				{
-					if (!scrolling)
-					{
-						backup_widths($thead);
-						scrolling = true;	
-					}
-					
-					var $win = $(this), st = $win.scrollTop();
-					if (st - pos.top > 0)
-					{
-						$thead.find('>tr>th').each(function(i, th)
-						{
-							var w = $tbody.find('>tr:eq(0) >td:nth-child(' + (i+1) + ')').outerWidth();
-							$(th).css({'min-width': w, width: w});	
-						});
-						$thead.css({position: 'absolute', top: st - pos.top, left: 0});
-					}
-					else
-					{
-						$thead.css({position: 'inherit', top: "", width: ""});
-						restore_widths($thead);
-					}
-										
-					clearTimeout(timeout);
-					timeout = setTimeout(function()
-					{
-						scrolling = false;
-					}, 50);
-				});
-			}*/
 			
 			load_data();
 			add_listeners();
