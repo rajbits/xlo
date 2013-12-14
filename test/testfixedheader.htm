@@ -128,7 +128,7 @@
 							$tbody.find('>tr >:nth-child(1)').each(function(i, td)
 							{
 								var $td = $(td);
-								$td.css({'min-height': $td.height()});
+								$td.css({'min-height': $td.outerHeight(), 'height': $td.outerHeight()});
 								
 								var $tr = $('<tr/>').append($td);
 								$coltbl.find('>tbody').append($tr);
@@ -136,6 +136,12 @@
 							
 							$coltbl.data('loaded', true);								
 						}
+						
+						$tbody.find('>tr >:nth-child(1)').each(function(i, td)
+						{
+							var $td = $(td), $ctd = $coltbl.find('>tbody >tr:eq(' + i + ') >:nth-child(1)');						
+							$ctd.css({'min-height': $td.outerHeight(), 'height': $td.outerHeight()});							
+						});
 						
 						$coltbl.css({left: sl - pos.left, top: 0}).show();
 						$coltbl.find('>thead').css({top: st - pos.top - 1, 'min-width': $coltbl.find('>tbody').width()});
