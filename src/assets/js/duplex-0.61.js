@@ -123,7 +123,7 @@
 				function remove(old, idx)
 				{
 					var $els = $.datay(old, '_bind');
-					if ($els != undefined) $.each($els, function(i, $el) { $el.remove() });
+					if ($els != undefined) $.each($els, function(i, $el) { $el.remove(); });
 				}
 				
 				$.each(ar, function(i, aa)
