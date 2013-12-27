@@ -18,10 +18,10 @@
 			function chg(e)
 			{
 				var $expr = e ? $(e.target) : $('#expr');				
-				var units = parse($expr.val());
-				console.log(JSON.stringify(units));
+				var start = parsex($expr.val());
+				console.log(JSON.stringify(start));
 				
-				var $ul = ui(units);
+				var $ul = uui(start);
 				$('#result').html('').append($ul);		
 			}
 			

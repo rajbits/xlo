@@ -103,3 +103,48 @@ function _ui(unit)
 		
 	return $li;
 }
+
+function lastNIndexOf(src, srch, n)
+{
+	var idx = src.length, i = 0;
+	while (idx >= 0 && i++ < n)
+		idx = src.lastIndexOf(srch, idx - 1);
+		
+	return idx;	
+}
+
+/**
+ * Idea is to split up the last object and attribute/dimension pulled out
+ * If the last segment is a word, pull that out
+ * If the last segment is an array, find out the last segment of an array.
+ * Ex: Kagaz.arrow[abra[cada.bra]]
+ * Ex: Kagaz.arrow[abra[cada.bra]].basic
+ * @param {String} str - String to be parsed
+ */
+function parsex(str)
+{
+	str = $.trim(str);
+	if (str == null || $.trim(str).length == 0) return null;
+	
+	var pos = str.lastIndexOf('.');
+	if (pos >= str.length - 1)
+		throw new Error('The expression does not seem to be valid!: ' + str);
+		
+	var attr = str.substr(pos + 1), arrs = attr.match(/(\])/), prs;
+	if (arrs && arrs.length > 0) //There is an array component
+	{
+		var idx = lastNIndexOf(str, '[', arrs.length);
+		prs = {o: str.substr(0, idx), a: str.substr(idx), type: 'array'};
+	}		
+	else
+		prs = {o: str.substring(0, pos), a: attr};
+	
+	return prs;
+}
+
+function uui(start)
+{
+	var $ul = $('<ul/>');
+	
+	return $ul;
+}
