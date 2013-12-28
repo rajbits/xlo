@@ -57,7 +57,7 @@
 		
 		reset();
 		
-		var $act = duplex.render({ model: { settings: settings, handlers: handlers }, template: $tmpl });
+		var $act = duplex.bind({ model: { settings: settings, handlers: handlers }, template: $tmpl });
 		$('#main').empty().append($act);			
 	});
 })(window, jQuery);

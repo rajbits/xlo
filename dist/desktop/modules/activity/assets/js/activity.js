@@ -9,7 +9,7 @@
 		Xlo.assets.loadview('../activity/assets/view/activity.htm', function(tmpl)
 		{
 			var $ad = Activity.day.get_ad();
-			var $cats = duplex.render({ model:{ activities: Activity.day.activities, default_parent: $ad, handler: handler }, template: $(tmpl) });
+			var $cats = duplex.bind({ model:{ activities: Activity.day.activities, default_parent: $ad, handler: handler }, template: $(tmpl) });
 			
 			$ad.append($cats);
 		});		
@@ -32,7 +32,7 @@
 		var set = {activity: activity, dim: dim};
 		var buck = Activity.day.find_bucket(set);
 		Activity.day.activities.push(set);
-		
+				
 		Activity.day.adjust_bucket(buck, $dest);
 	};
 		

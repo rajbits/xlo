@@ -42,7 +42,7 @@ function login()
 			Xlo.assets.loadview('assets/view/register.htm', function(data)
 			{
 				$('#main').empty();
-				var $register = duplex.render({model: {user: user, register: register, cancel: cancel_register}, template: $(data)});
+				var $register = duplex.bind({model: {user: user, register: register, cancel: cancel_register}, template: $(data)});
 				$('#main').append($register);
 			});
 		}
@@ -57,7 +57,7 @@ function login()
 			login();
 		}
 		
-		var $signin = duplex.render({model: { user: user, signIn: signIn, register_click: register_click }, template: $(data)});
+		var $signin = duplex.bind({model: { user: user, signIn: signIn, register_click: register_click }, template: $(data)});
 		$('#main').empty().append($signin);
 	});	
 }

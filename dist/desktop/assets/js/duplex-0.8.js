@@ -121,8 +121,18 @@
 	
 	function expr($scope, $xtra, a)
 	{
-		var f = new Function('return this.' + a).bind($.extend({}, $scope, $xtra));
-		return f();
+		try
+		{
+			var $c = $.extend({}, $scope, $xtra);
+			if (a == '') return $c;
+			
+			var f = new Function('return this.' + a).bind($c);
+			return f();	
+		}
+		catch(e)
+		{
+			console.error(e.message + ' ' + a);
+		}		
 	}
 	
 	var Handlers = 
@@ -158,7 +168,7 @@
 			{			
 				$.each(later ? datay(ar, '_tmpl') : [set], function(i, t)
 				{
-					if (t.p.parent().length == 0) t.p = $xtra.default_parent;
+					if (t.p == undefined || t.p.parent().length == 0) t.p = $scope.default_parent;
 					
 					var $tt = t.el.clone().appendTo(t.p);
 					datay(a, '_bind', $tt);
@@ -192,27 +202,33 @@
 		json: function($t, $scope, $xtra, a, type)
 		{
 			//First convert to json. Expecting a very basic json (a 2d one)			
-			var aa = a = $.trim(a), r = /(.*?):(.*?)($|,)/g, m;			
-			
+			var aa = a = $.trim(a), r = /(.*?):(.*?)($|,)/g, m;						
 			while((m = r.exec(aa)) !== null)
 			{
 				var o = m[1], attr = m[2];
 				o = $.trim(o); attr = $.trim(attr);
 
-				var prs = parsex(attr), obj = expr($scope, $xtra, prs.o), a = prs.a;
-				(function(o)
-				{
-					watch(obj, a, function(att, action, nu, old)
-					{
-						var k = {};
-						k[o] = nu;
-						$t[type](k);
-					});
-				})(o);										
-				
-				var k = {}; k[o] = expr($scope, $xtra, attr);
-				$t[type](k);
+				Handlers.setData($t, $scope, $xtra, type, o, attr);
 			}
+		},
+		
+		setData: function($t, $scope, $xtra, type, o, attr)
+		{
+			var prs = parsex(attr), obj = expr($scope, $xtra, prs.o), at = prs.a;
+			(function(o, obj, at, type)
+			{
+				watch(obj, at, function(att, action, nu, old)
+				{
+					if (at != att) return;
+					
+					var k = {};
+					k[o] = nu;
+					$t[type](k);
+				});
+			})(o, obj, at, type);
+			
+			var k = {}; k[o] = expr($scope, $xtra, attr);
+			$t[type](k);
 		},
 		
 		data: function($t, $scope, $xtra, a)
@@ -222,12 +238,12 @@
 		
 		attr: function($t, $scope, $xtra, a)
 		{
-			Handlers.json($t, $scope, $xtra, a, 'css');
+			Handlers.json($t, $scope, $xtra, a, 'attr');
 		},
 		
 		ui_event: function($t, $scope, $xtra, a)
 		{
-			
+			Handlers.json($t, $scope, $xtra, a, 'on');
 		},
 		
 		css: function($t, $scope, $xtra, a)

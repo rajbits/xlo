@@ -5,20 +5,20 @@
 			<thead>
 				<tr>
 					<th style='font-size: 70%'>Day</th>
-					<th dl-repeat='ds in settings.dates' dl-bind='ds.s' class='text-center'></th>
+					<th dp-repeat='ds in settings.dates' dp-bind='ds.s' class='text-center'></th>
 				</tr>
 				<tr style='height: 100px'>
 					<th style='font-size: 70%'>all day</th>
-					<th dl-repeat='ds in settings.dates'></th>
+					<th dp-repeat='ds in settings.dates'></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr dl-repeat='ts in settings.timestops_fmt'>
-					<td class='activity_time' dl-css='{ height: {{settings.cell_height}} }'>
-						<span class='activity_hr' dl-bind='ts.hr'></span>
-						<span class='activity_min' dl-bind='ts.min'></span>
+				<tr dp-repeat='ts in settings.timestops_fmt'>
+					<td class='activity_time' dp-css='height: settings.cell_height'>
+						<span class='activity_hr' dp-bind='ts.hr'></span>
+						<span class='activity_min' dp-bind='ts.min'></span>
 					</td>
-					<td dl-repeat='us in settings.units_ar' class='activity_slot' dl-ui-event='{ touchstart: {{ handlers.touchstart }}, dblclick: {{ handlers.touchstart }} }' dl-attr='{ hr: {{ ts.hr }}, min: {{ ts.min }} }'>
+					<td dp-repeat='us in settings.units_ar' class='activity_slot' dp-ui-event='touchstart: handlers.touchstart, dblclick: handlers.touchstart' dp-attr='hr: ts.hr, min: ts.min'>
 						<div class='activity_line_in_between'></div>
 					</td>
 				</tr>
