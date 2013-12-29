@@ -89,11 +89,21 @@
 .activity
 {
 	position: absolute;
-	border: 1px gray solid;
+	border: 1px #9aaab4 solid;
 	border-radius: 3px;
 	overflow: hidden;
-	font-size: 90%;
+	font-size: 80%;
 	padding: 3px;
+	background: #ffffff;
+	background: -moz-linear-gradient(top, #ffffff 0%, #b8cff0 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#b8cff0));
+	background: -webkit-linear-gradient(top, #ffffff 0%,#b8cff0 100%);
+	background: -o-linear-gradient(top, #ffffff 0%,#b8cff0 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%,#b8cff0 100%);
+	background: linear-gradient(to bottom, #ffffff 0%,#b8cff0 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#b8cff0',GradientType=0 );
+	-webkit-box-shadow: 2px 2px 2px 2px #dadadf;
+	box-shadow: 2px 2px 2px 2px #dadadf;
 }
 
 .activity_topbar, .activity_bottombar

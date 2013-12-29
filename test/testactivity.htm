@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Duplex test</title>
+		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div id='container' class='container'>
+			<h2>Family Names:</h2>
+		</div>
+		
+		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
+		<script src="../src/assets/lib/watch/watch.js"></script>
+		<script src='../src/assets/js/duplex-0.8.js'></script>
+		<script id='names' type='text/html'>
+			<span>
+				<div dp-repeat='l in list'>
+					<div class='col-md-6 col-xs-6 col-sm-6'>
+						<input dp-bind='l.firstName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
+					</div>
+					<div class='col-md-6 col-xs-6 col-sm-6'>
+						<input dp-bind='l.lastName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
+					</div>
+				</div>
+			</span>
+			
+			
+			<span>
+			<div dp-repeat='l in list'>
+				<div class='col-md-6 col-xs-6 col-sm-6'>
+					<input dp-bind='l.firstName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
+				</div>
+				<div class='col-md-6 col-xs-6 col-sm-6'>
+					<input dp-bind='l.lastName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
+				</div>
+			</div>
+			</span>
+			
+		</script>
+		<script>
+			var list =
+			[
+				{firstName: 'Raj', lastName: 'Chandrasekaran', color: 'blue', bgcolor: 'orange'},
+				{firstName: 'Jyothsna', lastName: 'Kothandaraman'},
+				{firstName: 'Vasinya', lastName: 'Rajkumar'},
+				{firstName: 'Chandrasekaran', lastName: 'Ganesan'},
+				{firstName: 'Padma', lastName: 'Guruswamy'},
+				{firstName: 'Alamelu', lastName: 'Ganesan'},
+				{firstName: 'Ganesa Iyer', lastName: 'MS'}
+			];
+			
+			var o =
+			{
+				template: $('#names').html(),
+				model: {list: list},
+				default_parent: $('#container')
+			};
+			
+			var $el = duplex.bind(o);
+			console.log($el.html());
+			$('#container').append($el);
+		</script>
+	</body>
+</html>
