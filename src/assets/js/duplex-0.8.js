@@ -113,9 +113,10 @@
 		
 		var $scope = o.model;
 		var $t = $(o.template).wrap('<div/>').parent();
-		
+			
 		var $xtra = { default_parent: o.default_parent };
 		recurse($t, $scope, $xtra);
+		
 		return $t.children();
 	}
 	
@@ -168,7 +169,8 @@
 			{			
 				$.each(later ? datay(ar, '_tmpl') : [set], function(i, t)
 				{
-					if (t.p == undefined || t.p.parent().length == 0) t.p = $scope.default_parent;
+					if (later && (t.p == undefined || t.p.parent().length == 0))
+						t.p = $xtra.default_parent;
 					
 					var $tt = t.el.clone().appendTo(t.p);
 					datay(a, '_bind', $tt);
@@ -184,17 +186,20 @@
 		
 		bind: function($t, $scope, $xtra, a)
 		{
-			var v = expr($scope, $xtra, a);
+			var v = expr($scope, $xtra, a), m = 'modifying';
 			$t.value(v);
 			
 			var prs = parsex(a), o = expr($scope, $xtra, prs.o), a = prs.a;
 			watch(o, a, function(attr, action, nu, old)
 			{
-				$t.value(nu);
+				if (!$t.data(m))
+					$t.value(nu);
+				$t.data(m, false);	
 			});
 			
-			$t.on('change, keyup', function(e)
+			$t.on('change, keyup, update', function(e)
 			{
+				$t.data(m, true);
 				o[a] = $t.value();
 			});
 		},

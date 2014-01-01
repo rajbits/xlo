@@ -1,57 +1,46 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Duplex test</title>
+		<title>Activities test</title>
 		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
+		<style>
+			.act-name
+			{
+				border-bottom: 1px black solid;
+				outline: none;
+			}
+			
+			.container
+			{
+				padding: 10px;
+			}
+		</style>
 	</head>
 	<body>
 		<div id='container' class='container'>
-			<h2>Family Names:</h2>
+			<h2>Activities:</h2>
 		</div>
 		
 		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
 		<script src="../src/assets/lib/watch/watch.js"></script>
 		<script src='../src/assets/js/duplex-0.8.js'></script>
-		<script id='names' type='text/html'>
-			<span>
-				<div dp-repeat='l in list'>
-					<div class='col-md-6 col-xs-6 col-sm-6'>
-						<input dp-bind='l.firstName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
-					</div>
-					<div class='col-md-6 col-xs-6 col-sm-6'>
-						<input dp-bind='l.lastName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
-					</div>
+		<script id='activities' type='text/html'>
+			<div class='row' dp-repeat='a in list'>
+				<div class='col-md-6 col-sm-6 col-xs-10'>
+					<div class='act-name' dp-bind='a.name' contenteditable='true'></div>
 				</div>
-			</span>
-			
-			
-			<span>
-			<div dp-repeat='l in list'>
-				<div class='col-md-6 col-xs-6 col-sm-6'>
-					<input dp-bind='l.firstName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
-				</div>
-				<div class='col-md-6 col-xs-6 col-sm-6'>
-					<input dp-bind='l.lastName' type='text' class='form-control' dp-css='color: l.color, background-color: l.bgcolor'></input>
-				</div>
-			</div>
-			</span>
-			
+				<div class='col-md-1 col-sm-1' dp-bind='a.priority' contenteditable='true'></div>
+			</div>			
 		</script>
 		<script>
-			var list =
-			[
-				{firstName: 'Raj', lastName: 'Chandrasekaran', color: 'blue', bgcolor: 'orange'},
-				{firstName: 'Jyothsna', lastName: 'Kothandaraman'},
-				{firstName: 'Vasinya', lastName: 'Rajkumar'},
-				{firstName: 'Chandrasekaran', lastName: 'Ganesan'},
-				{firstName: 'Padma', lastName: 'Guruswamy'},
-				{firstName: 'Alamelu', lastName: 'Ganesan'},
-				{firstName: 'Ganesa Iyer', lastName: 'MS'}
-			];
-			
+			var list = 
+			[{
+				name: 'First activity',
+				priority: 1
+			}];			
 			var o =
 			{
-				template: $('#names').html(),
+				template: $('#activities').html(),
 				model: {list: list},
 				default_parent: $('#container')
 			};
