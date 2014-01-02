@@ -197,7 +197,7 @@
 				$t.data(m, false);	
 			});
 			
-			$t.on('change, keyup, update', function(e)
+			$t.on('change keyup update', function(e)
 			{
 				$t.data(m, true);
 				o[a] = $t.value();
