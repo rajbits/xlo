@@ -170,7 +170,7 @@
 				$.each(later ? datay(ar, '_tmpl') : [set], function(i, t)
 				{
 					if (later && (t.p == undefined || t.p.parent().length == 0))
-						t.p = $xtra.default_parent;
+						t.p = $xtra.default_parent || $scope.default_parent;
 					
 					var $tt = t.el.clone().appendTo(t.p);
 					datay(a, '_bind', $tt);
@@ -185,16 +185,15 @@
 		},
 		
 		bind: function($t, $scope, $xtra, a)
-		{
-			var v = expr($scope, $xtra, a), m = 'modifying';
-			$t.value(v);
+		{			
+			var af = a.split('|'), a = $.trim(af[0]);
+			var v = expr($scope, $xtra, a), m = 'modifying';			
+			set(v);
 			
 			var prs = parsex(a), o = expr($scope, $xtra, prs.o), a = prs.a;
 			watch(o, a, function(attr, action, nu, old)
 			{
-				if (!$t.data(m))
-					$t.value(nu);
-				$t.data(m, false);	
+				set(nu);
 			});
 			
 			$t.on('change keyup update', function(e)
@@ -202,6 +201,26 @@
 				$t.data(m, true);
 				o[a] = $t.value();
 			});
+			
+			function set(v)
+			{
+				if (!$t.data(m))
+				{
+					if (af.length == 0)
+						return $t.value(v);
+					
+					for(var i = 1; i < af.length; i++)
+					{
+						//Formatters
+						var fn = expr($scope, $xtra, $.trim(af[i]));
+						v = fn(v);
+					}
+					
+					$t.value(v);
+				}
+					
+				$t.data(m, false);
+			}			
 		},
 		
 		json: function($t, $scope, $xtra, a, type)
@@ -259,6 +278,25 @@
 		animate: function($t, $scope, $xtra, a)
 		{
 			Handlers.json($t, $scope, $xtra, a, 'animate');
+		},
+		
+		plugin: function($t, $scope, $xtra, a)
+		{
+			var af = a.split(';');
+			$.each(af, function(i, aa)
+			{
+				as = $.trim(aa);
+				aa = expr($scope, $xtra, as);
+				
+				if (typeof(aa) == 'Function')
+				{
+					aa($t);
+				}
+				else if ($t[as])
+				{
+					$t[as]();
+				}
+			});
 		}
 	};
 	
@@ -270,7 +308,8 @@
 		{name: 'attr', handler: Handlers.attr},
 		{name: 'ui-event', handler: Handlers.ui_event},
 		{name: 'css', handler: Handlers.css},
-		{name: 'animate', handler: Handlers.animate}
+		{name: 'animate', handler: Handlers.animate},
+		{name: 'plugin', handler: Handlers.plugin},
 	];
 	
 	function recurse($t, $scope, $xtra)
