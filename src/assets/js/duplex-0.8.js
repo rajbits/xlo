@@ -280,7 +280,7 @@
 			Handlers.json($t, $scope, $xtra, a, 'animate');
 		},
 		
-		plugin: function($t, $scope, $xtra, a)
+		fn: function($t, $scope, $xtra, a)
 		{
 			var af = a.split(';');
 			$.each(af, function(i, aa)
@@ -288,7 +288,7 @@
 				as = $.trim(aa);
 				aa = expr($scope, $xtra, as);
 				
-				if (typeof(aa) == 'Function')
+				if (typeof(aa) == 'function')
 				{
 					aa($t);
 				}
@@ -297,6 +297,16 @@
 					$t[as]();
 				}
 			});
+		},
+		
+		plugin: function($t, $scope, $xtra, a)
+		{
+			Handlers.fn($t, $scope, $xtra, a);
+		},
+		
+		postCreate: function($t, $scope, $xtra, a)
+		{
+			Handlers.fn($t, $scope, $xtra, a);
 		}
 	};
 	
@@ -310,6 +320,7 @@
 		{name: 'css', handler: Handlers.css},
 		{name: 'animate', handler: Handlers.animate},
 		{name: 'plugin', handler: Handlers.plugin},
+		{name: 'post-create', handler: Handlers.postCreate}
 	];
 	
 	function recurse($t, $scope, $xtra)

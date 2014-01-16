@@ -32,6 +32,10 @@
 				font-size: 80%;
 				color: gray;
 			}
+			.grippy
+			{
+				color: gray;
+			}
 			
 			[contenteditable=true]:empty:before 
 			{
@@ -39,23 +43,37 @@
 				color: lightgrey;
 				font-size: 80%;
 			}
+			
+			#dd
+			{
+				position: absolute;
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
 		<div id='container' class='container'>
 			<h4>Activities</h4>
 		</div>
+		<div>			
+			<ul id='dd' class='dropdown-menu'>				
+			</ul>
+		</div>
 		
 		<script src='../src/assets/lib/jquery/jquery-2.0.3.min.js'></script>
 		<script src="../src/assets/lib/watch/watch.js"></script>
 		<script src='../src/assets/js/duplex-0.8.js'></script>
+		<script src="../src/assets/lib/pouchdb/pouchdb-1.1.0.min.js"></script>
 		<script src="timer.js"></script>
 		
 		<script id='activities' type='text/html'>
-			<div class='row act-row' dp-repeat='a in list'>				
+			<div dp-attr='id: a.id | formatId' class='row act-row' dp-repeat='a in list' dp-post-create='post_create'>
+				<div class='col-md-1 col-sm-1 col-xs-1'>
+					<span class='glyphicon glyphicon-th grippy'></span>
+				</div>			
 				<div class='col-md-6 col-sm-6 col-xs-8'>
-					<div>
-						<div dp-bind='a.name' contenteditable='true' placeholder='Activity name' dp-ui-event='keyup: tap'></div>
+					<div class='act-nm-st'>
+						<div dp-bind='a.name' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type'></div>
 						<div class='act-status' dp-bind='a.status' contenteditable='true' placeholder='Status/Notes'></div>
 					</div>
 				</div>
@@ -69,6 +87,9 @@
 				<div class='col-md-1 col-sm-1 col-xs-1' dp-bind='a.seconds' contenteditable='true' placeholder='Estimate'></div>				
 			</div>			
 		</script>
+		<script id='acts' type='text/html'>
+			<li dp-repeat='a in list'><a href='#' dp-bind='a.name'>AA</a></li>
+		</script>
 		<script>
 			$.fn.playToggle = function()
 			{
@@ -81,13 +102,50 @@
 							$s.removeClass(play).addClass(pause);
 						else
 							$s.removeClass(pause).addClass(play);
-					});					
+					});
 				});				
+			};
+			
+			$.cursorPosition = function()
+			{				
+				function getSelectionCoords()
+				{
+				    var sel = document.selection, range;
+				    var x = 0, y = 0;
+				    if (sel)
+				    {
+				        if (sel.type != "Control") 
+				        {
+				            range = sel.createRange();
+				            range.collapse(true);
+				            x = range.boundingLeft;
+				            y = range.boundingTop;
+				        }
+				    } 
+				    else if (window.getSelection)
+				    {
+				        sel = window.getSelection();
+				        if (sel.rangeCount)
+				        {
+				            range = sel.getRangeAt(0).cloneRange();
+				            if (range.getClientRects)
+				            {
+				                range.collapse(true);
+				                var rect = range.getClientRects()[0];
+				                x = rect.left;
+				                y = rect.top;
+				            }
+				        }
+				    }
+				    return { x: x, y: y };
+				}	
+				
+				return getSelectionCoords();							
 			};
 		</script>
 		<script>
 			var list = 
-			[{
+			[/*{
 				name: 'First activity',
 				priority: 1,
 				seconds: 500,
@@ -102,56 +160,153 @@
 				name: 'Third activity',
 				priority: 1,
 				seconds: 500
-			}
-			];			
-			var o =
-			{
-				template: $('#activities').html(),
-				model:
-				{
-					list: list,
-					formatTotal: function(v)
-					{
-						if (v == undefined) v = 0;
-						var timer = new Timer(v);				
-						return timer.format();
-					},
-					
-					timer: function(e)
-					{
-						var $me = $(this), a = $me.data('o');
-						if (a == null)
-							return;
-						
-						var timer = $me.data('timer');
-						var callbacks = 
-						{
-							tick: function(total_time)
-							{
-								a.total = total_time;
-							}
-						};
-						
-						if (timer == null)
-						{
-							timer = new Timer(a.total, callbacks);
-							$me.data('timer', timer);
-						}
-						
-						timer.toggle();			
-					},
-					
-					tap: function(e)
-					{
-						
-					}
-				},
-				default_parent: $('#container')
-			};
+			}*/];
 			
-			var $el = duplex.bind(o);
-			console.log($el.html());
-			$('#container').append($el);
+			var db;
+			function pre_load()
+			{
+				db.info(function(err, response)
+				{					
+					if (response.doc_count == 0)
+					{
+						db.bulkDocs({docs: list}, {}, function(err, response)
+						{
+							list.length = 0;							
+							fetchActivities();
+						});	
+					}
+					else
+						fetchActivities();															
+				});
+			}
+			
+			function load_db()
+			{
+				db = new PouchDB('xlo');
+				pre_load();
+			}
+			
+			load_db();
+		</script>
+		<script>
+			function fetchActivities()
+			{				
+				query_levels(1);
+			}
+			
+			function query_levels(level)
+			{
+				db.query(function(doc)
+				{
+					if (doc.level == null || doc.level == level)
+						emit(doc._id, null);
+				},
+				{include_docs: true},
+				function(err, response)
+				{
+					if (err)
+						throw err;
+					
+					$.each(response.rows, function(i, r)
+					{
+						if (r.doc.level == null) r.doc.level = 1;
+						if (r.doc.parent_id == null) r.doc.parent_id = 0;
+						
+						list.push(r.doc);
+					});
+					
+					loadActivities();
+				});
+			}
+			
+			function loadActivities()
+			{
+				var o =
+				{
+					template: $('#activities').html(),
+					model:
+					{
+						list: list,
+						formatTotal: function(v)
+						{
+							if (v == undefined) v = 0;
+							var timer = new Timer(v);				
+							return timer.format();
+						},
+
+						formatId: function(v)
+						{
+							if (v == undefined) return v;
+							return 'a' + v;	
+						},
+						
+						timer: function(e)
+						{
+							var $me = $(this), a = $me.data('o');
+							if (a == null)
+								return;
+							
+							var timer = $me.data('timer');
+							var callbacks = 
+							{
+								tick: function(total_time)
+								{
+									a.total = total_time;
+								}
+							};
+							
+							if (timer == null)
+							{
+								timer = new Timer(a.total, callbacks);
+								$me.data('timer', timer);
+							}
+							
+							timer.toggle();			
+						},
+						
+						post_create: function($t)
+						{
+							
+						},
+						
+						type: function(e)
+						{
+							/*var $me = $(e.target), $dd = $('#dd');
+							e.preventDefault(); e.stopImmediatePropagation();
+							
+							if (!$me.data('setup'))
+							{
+								$me.data({setup: true});
+								$me.on('blur', function(e)
+								{
+									$dd.hide();
+								});
+							}											
+							
+							var xy = $.cursorPosition();
+							$dd.css({left: xy.x, top: xy.y + 30}).show();*/
+							
+							var $me = $(e.target);				
+						}
+					},
+					default_parent: $('#container')
+				};
+				
+				var $el = duplex.bind(o);
+				$('#container').append($el);
+				/*			
+				o = 
+				{
+					model:
+					{
+						list: list
+					},
+					template: $('#acts').html()
+				};
+				$el = duplex.bind(o);
+				$('#dd').append($el);
+				*/	
+			}									
 		</script>
 	</body>
 </html>
