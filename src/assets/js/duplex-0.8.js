@@ -238,6 +238,68 @@
 		
 		setData: function($t, $scope, $xtra, type, o, attr)
 		{
+			var af = attr.split('|'), arg1 = af[0], arg1_ar = arg1.split(';'), args = [], output;
+			$.each(arg1_ar, function(i, a)
+			{
+				a = $.trim(a);
+				var val, txt;
+				
+				if (a.indexOf('"') == 0 && a.lastIndexOf('"') == a.length - 1)
+					(txt = true) && (val = a.substring(1, a.length - 1));
+				else
+					val = expr($scope, $xtra, a);
+					
+				args.push(val);
+				
+				if (!txt)
+				{
+					var prs = parsex(a), obj = expr($scope, $xtra, prs.o), at = prs.a;
+					(function(o, obj, at, type)
+					{
+						watch(obj, at, function(att, action, nu, old)
+						{
+							if (at != att) return;
+							set(nu, i);						
+						});
+					})(o, obj, at, type);
+				}								
+			});
+			
+			function set(output, idx)
+			{
+				//Formatters
+				for(var i = 1; i < af.length; i++)
+				{				
+					var fn = expr($scope, $xtra, $.trim(af[i]));
+					if (fn != undefined)
+					{
+						var aa = args;
+						if (idx) 
+							args[idx] = output;
+						else
+							aa = args.concat(output);
+							
+						output = fn.apply(this, aa);
+					}						
+				}
+				
+				if (output == null && args.length > 0)
+					output = args[0];
+			
+				var k = output;
+				if (o != null)
+				{
+					k = {};
+					k[o] = output;
+				}
+				$t[type](k);	
+			}
+			
+			set(output);		
+		},
+		
+		setData1: function($t, $scope, $xtra, type, o, attr)
+		{
 			var prs = parsex(attr), obj = expr($scope, $xtra, prs.o), at = prs.a;
 			(function(o, obj, at, type)
 			{

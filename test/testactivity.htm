@@ -67,7 +67,7 @@
 		<script src="timer.js"></script>
 		
 		<script id='activities' type='text/html'>
-			<div dp-attr='id: a.id | formatId' class='row act-row' dp-repeat='a in list' dp-post-create='post_create'>
+			<div dp-attr='id: "a"; a._id | prefix' class='row act-row' dp-repeat='a in list' dp-post-create='post_create'>
 				<div class='col-md-1 col-sm-1 col-xs-1'>
 					<span class='glyphicon glyphicon-th grippy'></span>
 				</div>			
@@ -234,10 +234,9 @@
 							return timer.format();
 						},
 
-						formatId: function(v)
+						prefix: function(txt, val)
 						{
-							if (v == undefined) return v;
-							return 'a' + v;	
+							return txt + val;
 						},
 						
 						timer: function(e)
