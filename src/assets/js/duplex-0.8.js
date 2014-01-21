@@ -185,42 +185,8 @@
 		},
 		
 		bind: function($t, $scope, $xtra, a)
-		{			
-			var af = a.split('|'), a = $.trim(af[0]);
-			var v = expr($scope, $xtra, a), m = 'modifying';			
-			set(v);
-			
-			var prs = parsex(a), o = expr($scope, $xtra, prs.o), a = prs.a;
-			watch(o, a, function(attr, action, nu, old)
-			{
-				set(nu);
-			});
-			
-			$t.on('change keyup update', function(e)
-			{
-				$t.data(m, true);
-				o[a] = $t.value();
-			});
-			
-			function set(v)
-			{
-				if (!$t.data(m))
-				{
-					if (af.length == 0)
-						return $t.value(v);
-					
-					for(var i = 1; i < af.length; i++)
-					{
-						//Formatters
-						var fn = expr($scope, $xtra, $.trim(af[i]));
-						v = fn(v);
-					}
-					
-					$t.value(v);
-				}
-					
-				$t.data(m, false);
-			}			
+		{		
+			Handlers.setData($t, $scope, $xtra, 'value', null, a);
 		},
 		
 		json: function($t, $scope, $xtra, a, type)
@@ -238,7 +204,7 @@
 		
 		setData: function($t, $scope, $xtra, type, o, attr)
 		{
-			var af = attr.split('|'), arg1 = af[0], arg1_ar = arg1.split(';'), args = [], output;
+			var af = attr.split('|'), arg1 = af[0], arg1_ar = arg1.split(';'), args = [], output, m = 'modifying';
 			$.each(arg1_ar, function(i, a)
 			{
 				a = $.trim(a);
@@ -261,6 +227,15 @@
 							if (at != att) return;
 							set(nu, i);						
 						});
+						
+						if (type == 'value')
+						{
+							$t.on('change keyup update', function(e)
+							{
+								$t.data(m, true);
+								obj[at] = $t[type]();
+							});	
+						}
 					})(o, obj, at, type);
 				}								
 			});
@@ -274,7 +249,7 @@
 					if (fn != undefined)
 					{
 						var aa = args;
-						if (idx) 
+						if (idx != undefined) 
 							args[idx] = output;
 						else
 							aa = args.concat(output);
@@ -295,26 +270,7 @@
 				$t[type](k);	
 			}
 			
-			set(output);		
-		},
-		
-		setData1: function($t, $scope, $xtra, type, o, attr)
-		{
-			var prs = parsex(attr), obj = expr($scope, $xtra, prs.o), at = prs.a;
-			(function(o, obj, at, type)
-			{
-				watch(obj, at, function(att, action, nu, old)
-				{
-					if (at != att) return;
-					
-					var k = {};
-					k[o] = nu;
-					$t[type](k);
-				});
-			})(o, obj, at, type);
-			
-			var k = {}; k[o] = expr($scope, $xtra, attr);
-			$t[type](k);
+			set(output);			
 		},
 		
 		data: function($t, $scope, $xtra, a)
