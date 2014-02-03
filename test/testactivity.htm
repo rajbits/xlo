@@ -56,6 +56,11 @@
 				color: white;
 			}
 			
+			.selected .act-status
+			{
+				color: white;
+			}
+			
 			.unselectable
 			{
 			   -moz-user-select: -moz-none;
@@ -67,8 +72,8 @@
 		</style>
 	</head>
 	<body>
-		<div id='container' class='container unselectable'>
-			<h4>Activities</h4>
+		<h4>Activities</h4>
+		<div id='container' class='container unselectable'>			
 		</div>
 		<div>			
 			<ul id='dd' class='dropdown-menu'>				
@@ -310,7 +315,7 @@
 				var $el = duplex.bind(o);
 				$('#container').append($el);
 				
-				$('div.act-row').sortselect();
+				$('#container').sortselect();
 				/*			
 				o = 
 				{

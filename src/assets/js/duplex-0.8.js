@@ -225,7 +225,10 @@
 						watch(obj, at, function(att, action, nu, old)
 						{
 							if (at != att) return;
-							set(nu, i);						
+							if (!$t.data(m))
+								set(nu, i);
+							
+							$t.data(m, false);			
 						});
 						
 						if (type == 'value')
