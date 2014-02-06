@@ -73,8 +73,8 @@
 	</head>
 	<body>
 		<h4>Activities</h4>
-		<div id='container' class='container unselectable'>			
-		</div>
+		<ul id='container' class='container unselectable'>			
+		</ul>
 		<div>			
 			<ul id='dd' class='dropdown-menu'>				
 			</ul>
@@ -88,7 +88,7 @@
 		<script src="jquery.sortselect.js"></script>
 		
 		<script id='activities' type='text/html'>
-			<div dp-attr='id: "a"; a._id | prefix' class='row act-row' dp-repeat='a in list' dp-post-create='post_create'>
+			<li dp-attr='id: "a"; a._id | prefix' class='row act-row' dp-repeat='a in list' dp-post-create='post_create'>
 				<div class='col-md-1 col-sm-1 col-xs-1'>
 					<span class='glyphicon glyphicon-th grippy'></span>
 				</div>			
@@ -106,10 +106,7 @@
 				</div>
 				<div class='col-md-1 col-sm-1 col-xs-1' dp-bind='a.priority' contenteditable='true' placeholder='Priority'></div>
 				<div class='col-md-1 col-sm-1 col-xs-1' dp-bind='a.seconds' contenteditable='true' placeholder='Estimate'></div>				
-			</div>			
-		</script>
-		<script id='acts' type='text/html'>
-			<li dp-repeat='a in list'><a href='#' dp-bind='a.name'>AA</a></li>
+			</li>			
 		</script>
 		<script>
 			$.fn.playToggle = function()

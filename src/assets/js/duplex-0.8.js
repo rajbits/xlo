@@ -147,8 +147,7 @@
 				return;
 			}
 			
-			var itr = p[1], list = p[2], $p = $t.parent(), $tmpl = $t.removeAttr(DP + 'repeat').remove();
-			
+			var itr = p[1], list = p[2], $p = $t.parent(), $tmpl = $t.removeAttr(DP + 'repeat').remove();			
 			var ar = expr($scope, $xtra, list), set = { el: $tmpl, p: $p };
 			datay(ar, '_tmpl', set);
 			
