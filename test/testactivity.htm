@@ -94,7 +94,7 @@
 				</div>			
 				<div class='col-md-6 col-sm-6 col-xs-8'>
 					<div class='act-nm-st'>
-						<div dp-bind='a.name' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type'></div>
+						<div dp-bind='a.name' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, focus: reset, blur: saveToDB'></div>
 						<div class='act-status' dp-bind='a.status' contenteditable='true' placeholder='Status/Notes'></div>
 					</div>
 				</div>
@@ -235,7 +235,7 @@
 					
 					loadActivities();
 				});
-			}
+			}			
 			
 			function loadActivities()
 			{
@@ -304,6 +304,19 @@
 							$dd.css({left: xy.x, top: xy.y + 30}).show();*/
 							
 							var $me = $(e.target);				
+						},
+						
+						reset: function(e)
+						{
+							var $t = $(e.target);
+							$t.data('backup', $t.value());
+						},
+						
+						saveToDB: function(e)
+						{
+							var $t = $(e.target);
+							if ($t.data('backup') != $t.value())
+								console.log('Going to save to DB');
 						}
 					},
 					default_parent: $('#container')
@@ -312,7 +325,7 @@
 				var $el = duplex.bind(o);
 				$('#container').append($el);
 				
-				$('#container').sortselect();
+				$('#container').sortselect({handle: '>div >span.grippy'});
 				/*			
 				o = 
 				{

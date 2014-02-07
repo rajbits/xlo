@@ -25,7 +25,7 @@
 						if (e.shiftKey && $prev != undefined)
 						{
 							var si = $prev.index(), ci = $me.index();						
-							$list = $me.parent().children(':gt(' + Math.min(si - 1, ci - 1) + '):lt(' + Math.max(ci, si) + ')').addClass(sc);
+							$list = $me.parent().children().slice(Math.min(ci, si), Math.max(ci, si) + 1).addClass(sc);
 							$list.addClass('unselectable');
 							
 							return;
@@ -58,9 +58,14 @@
 				if (pref.sort)
 				{
 					var $doc = $(document);
-					$me.on('mousedown', function(e)
+					var $dragger = $me;
+					
+					if (pref.handle)
+						$dragger = $(pref.handle, $me);
+					
+					$dragger.on('mousedown', function(e)
 					{	
-						var $drag = $(e.currentTarget), idx = $drag.index(), w = $drag.width();
+						var $drag = $(e.currentTarget).parents('li:eq(0)').css({listStyle: 'none'}), idx = $drag.index(), w = $drag.width();
 						var $placeholder;
 						
 						function move(e)
@@ -83,7 +88,7 @@
 						}
 						
 						function up(e)
-						{							
+						{
 							$drag.css({position: 'static', width: 'auto', opacity: 1}).insertBefore($placeholder);
 							if ($placeholder) $placeholder.remove();
 							$drag = false;
