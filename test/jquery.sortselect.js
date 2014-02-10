@@ -11,7 +11,8 @@
 				$mees = $el.children(),
 				$prev, //previously selected one
 				$list, //selected list
-				bg = 'background-color';
+				bg = 'background-color',
+				usc = 'unselectable';
 			
 			$mees.each(function()
 			{
@@ -21,19 +22,29 @@
 					var sc = pref.selectableClass;
 					$me.on('click tap', function(e)
 					{
-						$me = $(this);					
+						$me = $(this);				
+						if ((e.ctrlKey || e.metaKey) && $prev != undefined)
+						{
+							if (!$list) $list = $();
+							$list.add($prev);
+							$prev = $me;
+							$list.add($me.addClass(sc));
+							
+							return;	
+						}
+								
 						if (e.shiftKey && $prev != undefined)
 						{
 							var si = $prev.index(), ci = $me.index();						
 							$list = $me.parent().children().slice(Math.min(ci, si), Math.max(ci, si) + 1).addClass(sc);
-							$list.addClass('unselectable');
+							$list.addClass(usc);
 							
 							return;
 						}
 						
 						if ($list)
 						{
-							$list.removeClass(sc).removeClass('unselectable');
+							$list.removeClass(sc).removeClass(usc);
 							$list = undefined;
 						}
 						
