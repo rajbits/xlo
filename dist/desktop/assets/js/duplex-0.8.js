@@ -147,8 +147,7 @@
 				return;
 			}
 			
-			var itr = p[1], list = p[2], $p = $t.parent(), $tmpl = $t.removeAttr(DP + 'repeat').remove();
-			
+			var itr = p[1], list = p[2], $p = $t.parent(), $tmpl = $t.removeAttr(DP + 'repeat').remove();			
 			var ar = expr($scope, $xtra, list), set = { el: $tmpl, p: $p };
 			datay(ar, '_tmpl', set);
 			
@@ -185,42 +184,8 @@
 		},
 		
 		bind: function($t, $scope, $xtra, a)
-		{			
-			var af = a.split('|'), a = $.trim(af[0]);
-			var v = expr($scope, $xtra, a), m = 'modifying';			
-			set(v);
-			
-			var prs = parsex(a), o = expr($scope, $xtra, prs.o), a = prs.a;
-			watch(o, a, function(attr, action, nu, old)
-			{
-				set(nu);
-			});
-			
-			$t.on('change keyup update', function(e)
-			{
-				$t.data(m, true);
-				o[a] = $t.value();
-			});
-			
-			function set(v)
-			{
-				if (!$t.data(m))
-				{
-					if (af.length == 0)
-						return $t.value(v);
-					
-					for(var i = 1; i < af.length; i++)
-					{
-						//Formatters
-						var fn = expr($scope, $xtra, $.trim(af[i]));
-						v = fn(v);
-					}
-					
-					$t.value(v);
-				}
-					
-				$t.data(m, false);
-			}			
+		{		
+			Handlers.setData($t, $scope, $xtra, 'value', null, a);
 		},
 		
 		json: function($t, $scope, $xtra, a, type)
@@ -238,21 +203,76 @@
 		
 		setData: function($t, $scope, $xtra, type, o, attr)
 		{
-			var prs = parsex(attr), obj = expr($scope, $xtra, prs.o), at = prs.a;
-			(function(o, obj, at, type)
+			var af = attr.split('|'), arg1 = af[0], arg1_ar = arg1.split(';'), args = [], output, m = 'modifying';
+			$.each(arg1_ar, function(i, a)
 			{
-				watch(obj, at, function(att, action, nu, old)
-				{
-					if (at != att) return;
+				a = $.trim(a);
+				var val, txt;
+				
+				if (a.indexOf('"') == 0 && a.lastIndexOf('"') == a.length - 1)
+					(txt = true) && (val = a.substring(1, a.length - 1));
+				else
+					val = expr($scope, $xtra, a);
 					
-					var k = {};
-					k[o] = nu;
-					$t[type](k);
-				});
-			})(o, obj, at, type);
+				args.push(val);
+				
+				if (!txt)
+				{
+					var prs = parsex(a), obj = expr($scope, $xtra, prs.o), at = prs.a;
+					(function(o, obj, at, type)
+					{
+						watch(obj, at, function(att, action, nu, old)
+						{
+							if (at != att) return;
+							if (!$t.data(m))
+								set(nu, i);
+							
+							$t.data(m, false);			
+						});
+						
+						if (type == 'value')
+						{
+							$t.on('change keyup update', function(e)
+							{
+								$t.data(m, true);
+								obj[at] = $t[type]();
+							});	
+						}
+					})(o, obj, at, type);
+				}								
+			});
 			
-			var k = {}; k[o] = expr($scope, $xtra, attr);
-			$t[type](k);
+			function set(output, idx)
+			{
+				//Formatters
+				for(var i = 1; i < af.length; i++)
+				{				
+					var fn = expr($scope, $xtra, $.trim(af[i]));
+					if (fn != undefined)
+					{
+						var aa = args;
+						if (idx != undefined) 
+							args[idx] = output;
+						else
+							aa = args.concat(output);
+							
+						output = fn.apply(this, aa);
+					}						
+				}
+				
+				if (output == null && args.length > 0)
+					output = args[0];
+			
+				var k = output;
+				if (o != null)
+				{
+					k = {};
+					k[o] = output;
+				}
+				$t[type](k);	
+			}
+			
+			set(output);			
 		},
 		
 		data: function($t, $scope, $xtra, a)
@@ -280,7 +300,7 @@
 			Handlers.json($t, $scope, $xtra, a, 'animate');
 		},
 		
-		plugin: function($t, $scope, $xtra, a)
+		fn: function($t, $scope, $xtra, a)
 		{
 			var af = a.split(';');
 			$.each(af, function(i, aa)
@@ -288,7 +308,7 @@
 				as = $.trim(aa);
 				aa = expr($scope, $xtra, as);
 				
-				if (typeof(aa) == 'Function')
+				if (typeof(aa) == 'function')
 				{
 					aa($t);
 				}
@@ -297,6 +317,16 @@
 					$t[as]();
 				}
 			});
+		},
+		
+		plugin: function($t, $scope, $xtra, a)
+		{
+			Handlers.fn($t, $scope, $xtra, a);
+		},
+		
+		postCreate: function($t, $scope, $xtra, a)
+		{
+			Handlers.fn($t, $scope, $xtra, a);
 		}
 	};
 	
@@ -310,6 +340,7 @@
 		{name: 'css', handler: Handlers.css},
 		{name: 'animate', handler: Handlers.animate},
 		{name: 'plugin', handler: Handlers.plugin},
+		{name: 'post-create', handler: Handlers.postCreate}
 	];
 	
 	function recurse($t, $scope, $xtra)
