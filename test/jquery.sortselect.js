@@ -9,60 +9,35 @@
 		{
 			var $el = $(el),
 				$mees = $el.children(),
-				$prev, //previously selected one
-				$list, //selected list
-				bg = 'background-color',
-				usc = 'unselectable';
+				$last;
+			
+			function getCheck($elem)
+			{
+				return $elem.find('input:checkbox.' + pref.checkbox);
+			}
+			
+			function check($elem, chk)
+			{
+				if (chk == undefined) chk = true;
+				getCheck($elem).attr({checked: chk});
+			}
 			
 			$mees.each(function()
 			{
-				var $me = $(this);
+				var $me = $(this);								
 				if (pref.select)
-				{
-					var sc = pref.selectableClass;
-					$me.on('click tap', function(e)
+				{								
+					getCheck($me).on('click tap', function(e)
 					{
-						$me = $(this);				
-						if ((e.ctrlKey || e.metaKey) && $prev != undefined)
+						var $self = $(e.target);									
+						if (e.shiftKey && $last != undefined)					
 						{
-							if (!$list) $list = $();
-							$list.add($prev);
-							$prev = $me;
-							$list.add($me.addClass(sc));
-							
-							return;	
-						}
-								
-						if (e.shiftKey && $prev != undefined)
-						{
-							var si = $prev.index(), ci = $me.index();						
-							$list = $me.parent().children().slice(Math.min(ci, si), Math.max(ci, si) + 1).addClass(sc);
-							$list.addClass(usc);
-							
-							return;
+							var $checks = getCheck($el), pi = $checks.index($last), ci = $checks.index($self);
+							$checks.slice(Math.min(pi, ci), Math.max(pi, ci) + 1).prop({checked: true});
+							console.log($checks); 
 						}
 						
-						if ($list)
-						{
-							$list.removeClass(sc).removeClass(usc);
-							$list = undefined;
-						}
-						
-						if ($me.hasClass(sc))
-						{
-							$me.removeClass(sc);
-							if ($prev) 
-							{
-								$prev.removeClass(sc);
-								$prev = undefined;
-							}
-							
-							return;
-						}
-						
-						if ($prev) $prev.removeClass(sc);
-						$me.addClass(sc);
-						$prev = $me;
+						$last = $self.is(':checked') ? $self : undefined;
 					});				
 				}
 				
@@ -76,7 +51,7 @@
 					
 					$dragger.on('mousedown', function(e)
 					{	
-						var $drag = $(e.currentTarget).parents('li:eq(0)').css({listStyle: 'none'}), idx = $drag.index(), w = $drag.width();
+						var $drag = $(e.currentTarget).parents('li:eq(0)'), idx = $drag.index(), w = $drag.width();
 						var $placeholder;
 						
 						function move(e)
@@ -84,9 +59,9 @@
 							var $s = $(e.target), $pp = $s.parentsUntil($el), x = e.clientX, y = e.clientY, b = 5;
 							$drag.css({position: 'absolute', width: '100%', opacity: 0.8, left: x + b, top: y + b});
 					
-							if ($pp.length == 0 || !$pp.eq(0).parent().is($el)) return;
+							if ($pp.length == 0 || !$pp.eq($pp.length - 1).parent().is($el)) return;
 
-							$pp = $pp.eq(0);			
+							$pp = $pp.eq($pp.length - 1);			
 							var pos = $pp.position(), h = $pp.height();
 														
 							if ($placeholder == null)
