@@ -8,21 +8,29 @@
 			{
 				outline: none;
 			}
+			
 			.act-row
 			{
 				padding: 4px;
 				border-bottom: 1px lightgrey solid;
 			}		
+			
 			.act-row .act-play-btn
 			{
 				position: relative;
 				top: -4px;
 			}	
+			
 			.act-row .glyphicon
 			{
-				font-size: 90%;
-				cursor: -webkit-grabbing;
-			}		
+				font-size: 90%;				
+			}
+			
+			.grippy
+			{
+				cursor: -webkit-grab;
+			}	
+			
 			.container
 			{
 				padding: 10px;
@@ -38,6 +46,7 @@
 				font-size: 80%;
 				color: gray;
 			}
+			
 			.grippy
 			{
 				color: gray;
@@ -88,7 +97,12 @@
 			.act-moved
 			{
 				opacity: 1;
-			}			
+			}
+			
+			.act-target
+			{
+				border: 1px lightblue solid;
+			}		
 		</style>
 	</head>
 	<body>
@@ -340,8 +354,7 @@
 				};
 				
 				var $el = duplex.bind(o);
-				$('#container').append($el);
-				// $('#container').sortselect({handle: '>div >div >span.grippy', checkbox: 'act-select'});	
+				$('#container').append($el);	
 			}									
 		</script>
 	</body>
