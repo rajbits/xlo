@@ -3,15 +3,15 @@
 	<head>
 		<title>Activities test</title>
 		<link rel="stylesheet" href="../src/assets/lib/bootstrap/css/bootstrap.min.css" />
-		<style>
-			body
-			{
-				padding: 20px;	
-			}
-			
+		<style>			
 			*, button
 			{
 				outline: none;
+			}
+			
+			#container li
+			{
+				/*list-style-type: none;	*/
 			}
 			
 			.act-row
@@ -116,8 +116,8 @@
 			<ol id='container' class='unselectable'>			
 			</ol>
 			<div>			
-				<ol id='dd' class='dropdown-menu'>				
-				</ol>
+				<ul id='dd' class='dropdown-menu'>				
+				</ul>
 			</div>
 		</div>		
 		
@@ -130,16 +130,19 @@
 		<script src="jquery.sort.js"></script>
 		
 		<script id='activities' type='text/html'>
-			<li dp-attr='id: "a"; a._id | prefix' class='act-row row' dp-repeat='a in list' dp-post-create='post_create'>
-				<div class='pull-up'>
-					<div class='col-md-1 col-sm-1 col-xs-1 no-pad'>
-						<span class='glyphicon glyphicon-th grippy' dp-plugin='sort'></span>
-						<input class='act-select' type='checkbox' dp-plugin='select'/>
-					</div>			
+			<li dp-attr='id: "a"; a._id | prefix' class='act-row' dp-repeat='a in list' dp-post-create='post_create'>
+				<div class='pull-up row'>
 					<div class='col-md-6 col-sm-6 col-xs-8 no-pad'>
-						<div class='act-nm-st'>
-							<div class='act-name' dp-bind='a.name' dp-data='o: a' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, focus: reset, blur: saveToDB'></div>
-							<div class='act-status' dp-bind='a.status' contenteditable='true' placeholder='Status/Notes'></div>
+						<div class='act-nm-st''>
+							<div class='col-md-3 col-sm-3 col-xs-3 row' style='padding-right: 0px; padding-left: 25px;'>
+								<span class='glyphicon glyphicon-th grippy' dp-plugin='sort'></span>
+								<input class='act-select' type='checkbox' dp-plugin='select'/>
+								<span class='glyphicon glyphicon-chevron-right act-collapse' style='display: inline-block;'></span>
+							</div>
+							<div class='col-md-9 col-sm-9 col-xs-9'>
+								<div class='act-name' dp-bind='a.name' dp-data='o: a' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, focus: reset, blur: saveToDB'></div>
+								<div class='act-status col-xs-offset-3' dp-bind='a.status' contenteditable='true' placeholder='Status/Notes'></div>
+							</div>
 						</div>
 					</div>
 					<div class='col-md-1 col-sm-1 col-xs-1'>
@@ -151,7 +154,7 @@
 					<div class='col-md-1 col-sm-1 hidden-xs' dp-bind='a.priority' contenteditable='true' placeholder='Priority'></div>
 					<div class='col-md-1 col-sm-1 hidden-xs' dp-bind='a.seconds' contenteditable='true' placeholder='Estimate'></div>
 				</div>
-			</li>			
+			</li>
 		</script>
 		<script>
 			$.fn.playToggle = function()
