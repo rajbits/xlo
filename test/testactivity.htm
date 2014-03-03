@@ -285,31 +285,29 @@
 				if (l == undefined) l = list;
 				var t = $me.text();
 				
-				var id = 'act-name-dd', $dd = $('#' + id);
+				var id = 'act-name-dd', $dd = $('#' + id), $ul = $dd.find('>ul');
 				if ($dd.length == 0)
-					$dd = $('<ul/>').attr({id: id})
-							.css({listStyle: 'none', position: 'absolute', border: '1px black solid', backgroundColor: '#fff', paddingLeft: '5px'})
-							.appendTo(document.body)
-							.find('>li')
-							.on('click tap', function(e)
-							{
-								
-								$dd.empty();
-							});
-				
+				{
+					$ul = $('<ul/>')
+							.css({listStyle: 'none', paddingLeft: '5px'});
+					$dd = $('<div/>')
+							.attr({id: id})
+							.css({ height: '200', overflow: 'auto', position: 'absolute', border: '1px #d3d3d3 solid', backgroundColor: '#fff' })
+							.append($ul)
+							.appendTo(document.body);
+				}
+					
 				var results = $.grep(l, function(item)
 				{
 					if (item == undefined || item.name == undefined) return false;
 					return item.name.search(RegExp(t, 'i')) != -1;
 				});
 				
-				$dd.empty();
-				$.each(results, function(i, term){ $dd.append('<li>' + term.name + '</li>'); });
+				$ul.empty();
+				$.each(results, function(i, term){ $ul.append('<li>' + term.name + '</li>'); });
 				
 				var pos = $me.offset(), curpos = $.cursorPosition();
-				console.log(curpos);
-				console.log($(document.body).scrollTop());
-				$dd.css({left: pos.left, top: pos.top + curpos.y - $(document.body).scrollTop(), width: $me.outerWidth()});
+				$dd.css({left: pos.left, top: curpos.y + $(document.body).scrollTop() + 20, width: $me.outerWidth()});
 			};
 						
 			function loadActivities()
