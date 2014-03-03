@@ -9,11 +9,6 @@
 				outline: none;
 			}
 			
-			#container li
-			{
-				/*list-style-type: none;	*/
-			}
-			
 			.act-row
 			{
 				padding: 4px;
@@ -137,7 +132,7 @@
 							<div class='col-md-3 col-sm-3 col-xs-3 row' style='padding-right: 0px; padding-left: 25px;'>
 								<span class='glyphicon glyphicon-th grippy' dp-plugin='sort'></span>
 								<input class='act-select' type='checkbox' dp-plugin='select'/>
-								<span class='glyphicon glyphicon-chevron-right act-collapse' style='display: inline-block;'></span>
+								<span class='glyphicon act-collapse' style='display: inline-block;'></span>
 							</div>
 							<div class='col-md-9 col-sm-9 col-xs-9'>
 								<div class='act-name' dp-bind='a.name' dp-data='o: a' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, focus: reset, blur: saveToDB'></div>
@@ -285,6 +280,38 @@
 				});
 			}			
 			
+			var autoComplete = function($me, e, l)
+			{
+				if (l == undefined) l = list;
+				var t = $me.text();
+				
+				var id = 'act-name-dd', $dd = $('#' + id);
+				if ($dd.length == 0)
+					$dd = $('<ul/>').attr({id: id})
+							.css({listStyle: 'none', position: 'absolute', border: '1px black solid', backgroundColor: '#fff', paddingLeft: '5px'})
+							.appendTo(document.body)
+							.find('>li')
+							.on('click tap', function(e)
+							{
+								
+								$dd.empty();
+							});
+				
+				var results = $.grep(l, function(item)
+				{
+					if (item == undefined || item.name == undefined) return false;
+					return item.name.search(RegExp(t, 'i')) != -1;
+				});
+				
+				$dd.empty();
+				$.each(results, function(i, term){ $dd.append('<li>' + term.name + '</li>'); });
+				
+				var pos = $me.offset(), curpos = $.cursorPosition();
+				console.log(curpos);
+				console.log($(document.body).scrollTop());
+				$dd.css({left: pos.left, top: pos.top + curpos.y - $(document.body).scrollTop(), width: $me.outerWidth()});
+			};
+						
 			function loadActivities()
 			{
 				var o =
@@ -331,7 +358,7 @@
 						
 						post_create: function($t)
 						{
-														
+							
 						},
 						
 						type: function(e)
@@ -340,7 +367,11 @@
 							if (e.keyCode == 9) //TAB
 							{
 								
+								return true;
 							}
+							
+							//Show autocomplete
+							autoComplete($me, e);
 							
 							return true;				
 						},
@@ -362,7 +393,9 @@
 				};
 				
 				var $el = duplex.bind(o);
-				$('#container').append($el);	
+				$('#container').append($el);
+				
+				for(var i = 0; i < 10; i++) list.push({name: 'abcd' + i});
 			}									
 		</script>
 	</body>

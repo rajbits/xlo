@@ -13,13 +13,14 @@
 				
 				if (e.shiftKey && $last)
 				{
-					var $checks = $el.find('input:checkbox:eq(0)'), pi = $checks.index($last), ci = $checks.index($self);
+					var $checks = $el.find('input:checkbox'), pi = $checks.index($last), ci = $checks.index($self);
 					$checks.slice(Math.min(pi, ci), Math.max(pi, ci) + 1).prop({checked: true});
 					
-					return;
+					return true;
 				}
 				
-				$el.data('last', $self.is(':checked') ? $self : undefined);
+				if ($self.is(':checked')) $el.data('last', $self); else $el.removeData('last');
+				return true;
 			});
 		});
 	};
