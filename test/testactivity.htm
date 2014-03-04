@@ -135,7 +135,7 @@
 								<span class='glyphicon act-collapse' style='display: inline-block;'></span>
 							</div>
 							<div class='col-md-9 col-sm-9 col-xs-9'>
-								<div class='act-name' dp-bind='a.name' dp-data='o: a' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, keyup: autocomplete, focus: reset, blur: saveToDB'></div>
+								<div class='act-name' dp-bind='a.name' dp-data='o: a' contenteditable='true' placeholder='Activity name' dp-ui-event='keydown: type, focus: reset, blur: saveToDB' dp-plugin='autoComplete'></div>
 								<div class='act-status col-xs-offset-3' dp-bind='a.status' contenteditable='true' placeholder='Status/Notes'></div>
 							</div>
 						</div>
@@ -280,34 +280,129 @@
 				});
 			}			
 			
-			var autoComplete = function($me, e, l)
+			$.fn.autoComplete  = function()
 			{
-				if (l == undefined) l = list;
-				var t = $me.text();
-				
-				var id = 'act-name-dd', $dd = $('#' + id), $ul = $dd.find('>ul');
-				if ($dd.length == 0)
+				return this.each(function()
 				{
-					$ul = $('<ul/>')
-							.css({listStyle: 'none', paddingLeft: '5px'});
-					$dd = $('<div/>')
-							.attr({id: id})
-							.css({ 'max-height': '100px', overflow: 'auto', position: 'absolute', border: '1px #d3d3d3 solid', backgroundColor: '#fff' })
-							.append($ul)
-							.appendTo(document.body);
-				}
+					var l, $me = $(this), id = 'act-name-dd', $dd = $('#' + id), $ul = $dd.find('>ul');			
+					if (l == undefined) l = list;
 					
-				var results = $.grep(l, function(item)
-				{
-					if (item == undefined || item.name == undefined) return false;
-					return item.name.search(RegExp(t, 'i')) != -1;
+					$me.on('keyup', function(e)
+					{
+						var t = $me.text();
+						if ($dd.length == 0)
+						{
+							$ul = $('<ul/>')
+									.css({listStyle: 'none', paddingLeft: '0px'});
+							$dd = $('<div/>')
+									.attr({id: id})
+									.css({ 'max-height': '100px', overflow: 'auto', position: 'absolute', border: '1px #d3d3d3 solid', backgroundColor: '#fff' })
+									.append($ul)
+									.appendTo(document.body);
+						}
+							
+						var kc = e.keyCode;
+						if ((kc >= 46 && kc <= 111) || kc >= 186 || kc == 8)
+						{
+							var results = $.grep(l, function(item)
+							{
+								if (item == undefined || item.name == undefined) return false;
+								return item.name.search(RegExp(t, 'i')) != -1;
+							});
+										
+							$ul.empty();
+							$.each(results, function(i, term)
+							{
+								var $li = $('<li/>')
+									.css({cursor: 'pointer', paddingLeft: '5px'})
+									.html(term.name)
+									.appendTo($ul)
+									.on('mouseover', function(e)
+									{
+										var $target = $(e.target);
+										if ($target.data('selected')) return;
+										
+										$target.css({'background-color': 'lightgrey'});
+									})
+									.on('mouseout', function(e)
+									{
+										var $target = $(e.target);
+										if ($target.data('selected')) return;
+										
+										$target.css({'background-color': 'inherit'});
+									})
+									.on('click tap', function(e)
+									{
+										var $dds = $(e.target).parents('ul:eq(0)').parent();
+										var $src = $dds.data('src');
+										if ($src == undefined || $src.length == 0) return;
+				
+										$src.html($.trim($(e.target).html()));
+										$ul.empty();
+										
+										$dds.hide().removeData('src').removeData('selected');
+									});
+							});
+							
+							var pos = $me.offset(), curpos = $.cursorPosition();
+							$dd.show().css({left: pos.left, top: curpos.y + $(document.documentElement).scrollTop() + 20, width: $me.outerWidth()});
+							$dd.data('src', $me);	
+						}						
+					});
+					
+					$me.on('keydown', function(e)
+					{
+						var $sel = $dd.data('selected');
+						function select(upDown)
+						{
+							if ($sel == undefined || $sel.length == 0)
+								$sel = $ul.find('li:eq(0)').css({ backgroundColor: 'gray' });
+							else	
+							{
+								$sel.css({ backgroundColor: 'inherit' });
+								
+								var $nsel = (upDown == 'down') ? $sel.next() : $sel.prev();
+								if ($nsel.length == 0) $nsel = $ul.find('li:eq(0)');
+								  
+								$sel =  $nsel.css({ backgroundColor: 'gray' });								
+							}
+							
+							if ($sel.length > 0)
+							{
+								$sel.get(0).scrollIntoViewIfNeeded();
+								$dd.data('selected', $sel);	
+							}
+							else
+							{
+								$dd.removeData('selected');
+							}
+						}
+						
+						switch(e.keyCode)
+						{
+							case 40:							
+									select('down');							
+									break;
+									
+							case 38:
+									select('up');
+									break;					
+						}
+						
+						if (e.keyCode == 13 && $dd.is(':visible') && $ul.children().length > 0)
+						{
+							e.preventDefault(); e.stopImmediatePropagation();
+							$dd.data('selected').trigger('click');
+							
+							return false;
+						}
+					});
+					
+					$me.blur(function(e)
+					{
+						$dd.hide();	
+					});
 				});
-				
-				$ul.empty();
-				$.each(results, function(i, term){ $ul.append('<li>' + term.name + '</li>'); });
-				
-				var pos = $me.offset(), curpos = $.cursorPosition();
-				$dd.css({left: pos.left, top: curpos.y + $(document.body).scrollTop() + 20, width: $me.outerWidth()});
 			};
 						
 			function loadActivities()
@@ -371,11 +466,6 @@
 							return true;				
 						},
 						
-						autocomplete: function(e)
-						{
-							autoComplete($(e.target), e, list);
-						},
-						
 						reset: function(e)
 						{
 							var $t = $(e.target);
@@ -395,7 +485,7 @@
 				var $el = duplex.bind(o);
 				$('#container').append($el);
 				
-				for(var i = 0; i < 10; i++) list.push({name: 'abcd' + i});
+				for(var i = 0; i < 100; i++) list.push({name: 'abcd' + i});
 			}									
 		</script>
 	</body>
