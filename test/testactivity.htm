@@ -345,7 +345,7 @@
 							});
 							
 							var pos = $me.offset(), curpos = $.cursorPosition();
-							$dd.show().css({left: pos.left, top: curpos.y + $(document.documentElement).scrollTop() + 20, width: $me.outerWidth()});
+							$dd.show().css({left: pos.left, top: curpos.y + $(document.body).scrollTop() + 20, width: $me.outerWidth()});
 							$dd.data('src', $me);	
 						}						
 					});
@@ -392,7 +392,11 @@
 						if (e.keyCode == 13 && $dd.is(':visible') && $ul.children().length > 0)
 						{
 							e.preventDefault(); e.stopImmediatePropagation();
-							$dd.data('selected').trigger('click');
+							var $selected = $dd.data('selected'); 
+							if ($selected != undefined)
+								$selected.trigger('click');
+							else
+								$dd.hide();
 							
 							return false;
 						}
