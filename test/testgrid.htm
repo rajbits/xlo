@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Activities Grid test</title>
+	</head>
+	<body>
+		<div id='myGrid'>
+			
+		</div>
+		
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+		<script id="itemDetailsTemplate" type="text/x-jquery-tmpl">
+			<div class='item-details-form'>
+				{{each columns}}
+					<div class='item-details-label'>
+						${name}
+					</div>
+					<div class='item-details-editor-container' data-editorid='${id}'></div>
+				{{/each}}
+	
+				<hr/>
+				<div class='item-details-form-buttons'>
+					<button data-action='save'>Save</button>
+					<button data-action='cancel'>Cancel</button>
+				</div>
+			</div>
+		</script>
+		<script>
+			function loadCss(list, callback)
+			{
+				var head = document.getElementsByTagName('head')[0];
+				$.each(list, function(i, l)
+				{
+					$('<link/>').attr({ rel: 'stylesheet', href: l}).appendTo(head);
+				});
+				
+				if (callback) callback();
+			}
+			
+			function requiredFieldValidator(value)
+			{
+				if (value == null || value == undefined || !value.length)
+				{
+					return {valid: false, msg: "This is a required field"};
+				}
+				else
+				{
+					return {valid: true, msg: null};
+				}
+			}
+			
+			function apply()
+			{
+				var grid;
+				var data = [];
+				var columns =
+				[
+					{id: "title", name: "Title", field: "title", width: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator},
+					{id: "desc", name: "Description", field: "description", width: 100, editor: Slick.Editors.LongText},
+					{id: "duration", name: "Duration", field: "duration", editor: Slick.Editors.Text},
+					{id: "percent", name: "% Complete", field: "percentComplete", width: 80, resizable: false, formatter: Slick.Formatters.PercentCompleteBar, editor: Slick.Editors.PercentComplete},
+					{id: "start", name: "Start", field: "start", minWidth: 60, editor: Slick.Editors.Date},
+					{id: "finish", name: "Finish", field: "finish", minWidth: 60, editor: Slick.Editors.Date},
+					{id: "effort-driven", name: "Effort Driven", width: 80, minWidth: 20, maxWidth: 80, cssClass: "cell-effort-driven", field: "effortDriven", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox}
+				];
+				var options =
+				{
+					editable: true,
+					enableAddRow: true,
+					enableCellNavigation: true,
+					asyncEditorLoading: false,
+					autoEdit: true
+				};
+				
+				for (var i = 0; i < 500; i++)
+				{
+					var d = (data[i] = {});
+					
+					d["title"] = "Task " + i;
+					d["description"] = "This is a sample task description.\n  It can be multiline";
+					d["duration"] = "5 days";
+					d["percentComplete"] = Math.round(Math.random() * 100);
+					d["start"] = "01/01/2009";
+					d["finish"] = "01/05/2009";
+					d["effortDriven"] = (i % 5 == 0);
+				}
+
+				grid = new Slick.Grid("#myGrid", data, columns, options);
+			}
+			
+			function init()
+			{				
+				require
+				(
+					['../src/assets/lib/jquery/jquery-2.0.3.min.js'],
+					function($)
+					{
+						require
+						(
+							[
+								'https://code.jquery.com/ui/1.11.1/jquery-ui.min.js',
+								'http://cdn.jsdelivr.net/jquery.event.drag/2.2/jquery.event.drag.min.js',					 
+								sg + 'slick.core.js',
+								sg + 'slick.grid.js',
+								sg + 'slick.editors.js',
+								sg + 'slick.formatters.js',
+								sg + 'slick.dataview.js',
+								sg + 'slick.groupitemmetadataprovider.js',
+								sg + 'slick.remotemodel.js'		
+							], 
+							function()
+							{
+								apply();
+							}
+						);
+						
+						loadCss
+						([							
+							'../src/assets/lib/bootstrap/css/bootstrap.min.css',
+							'https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css',
+							sg + 'slick-default-theme.css',
+							sg + 'slick.grid.css',
+							'css/slick.example.css',
+							'css/testgrid.css'
+						]);
+					}					
+				);												
+			}
+			
+			var lib = 'lib/', sg = lib + 'slickgrid/';
+			init();
+			
+		</script>
+	</body>
+</html>

@@ -414,6 +414,7 @@
 				var o =
 				{
 					template: $('#activities').html(),
+					default_parent: $('#container'),
 					model:
 					{
 						list: list,
@@ -455,7 +456,7 @@
 						
 						post_create: function($t)
 						{
-							
+
 						},
 						
 						type: function(e)
@@ -487,9 +488,9 @@
 				};
 				
 				var $el = duplex.bind(o);
-				$('#container').append($el);
+				// .append($el);
 				
-				for(var i = 0; i < 100; i++) list.push({name: 'abcd' + i});
+				for(var i = 0; i < 1000; i++) list.push({name: 'abcd' + i});
 			}									
 		</script>
 	</body>
